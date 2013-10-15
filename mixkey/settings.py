@@ -147,3 +147,23 @@ LOGGING = {
         },
     }
 }
+
+
+# DEBUG MODE ##################################################################
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+# Override Settings ###########################################################
+try:
+    from settings_local import *
+except ImportError:
+    pass
+
+
+# TESTING #####################################################################
+if 'test' in sys.argv:
+    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
+    MEDIA_ROOT = os.path.join(BASE_PATH, 'test_media')
+    MEDIA_URL = '/test_media/'
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

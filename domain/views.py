@@ -5,6 +5,10 @@ from django.http import HttpResponse, HttpResponseNotFound
 from domain.models import Project, Sensor, Data
 
 def home(request):
+    
+    if request.GET.get('M') or request.GET.get('m') or request.GET.get('S') or request.GET.get('s'):
+        return data_create(request)
+        
     return HttpResponse('Hello Mixkey')
     
 def data_create(request):

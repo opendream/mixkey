@@ -7,8 +7,38 @@
     
     <link rel="stylesheet" href="{{ STATIC_URL }}libs/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/styles.css">
+    
+    {% block js %}{% endblock %}
+    
   </head>
   <body>
+    
+    <div class="hero-unit">
+      <h1>TELEMETRY STATION</h1>
+      <p>Data hub for store multiple projects from Mix Key</p>
+      <p>
+        <!--
+        <a class="btn btn-primary btn-large" href="#about">
+          Learn more
+        </a>
+        -->
+      </p>
+    </div>
+    
+    <div class="navbar">
+      <div class="navbar-inner">
+        <ul class="nav">
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="#map">Map</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
+      </div>
+    </div>
+    
+    
+    <div class="main-content">
+    {% block content %}{% endblock %}
+    </div>
     
   </body>
 </html>

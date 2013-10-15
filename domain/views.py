@@ -8,8 +8,11 @@ def home(request):
     
     if request.GET.get('M') or request.GET.get('m') or request.GET.get('S') or request.GET.get('s'):
         return data_create(request)
+    
+    data_list = Data.objects.all().order_by('-created')[0:20]
         
-    return HttpResponse('Hello Mixkey')
+        
+    return render(request, 'home.html', {'data_list': data_list})
     
 def data_create(request):
     

@@ -82,5 +82,8 @@ class Data(models.Model):
     
     created     = models.DateTimeField(auto_now_add=True)
     
+    def get_water_level(self):
+        return self.utrasonic
+        
     def __unicode__(self):
         return 'Sensor: %s at %s' % (self.sensor.get_name(), 'moment')

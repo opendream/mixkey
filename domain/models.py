@@ -47,6 +47,9 @@ class Project(models.Model):
     def get_name(self):
         return self.name or self.code
     
+    def __unicode__(self):
+        return self.get_name()
+    
     
 class Sensor(models.Model):
     
@@ -64,6 +67,9 @@ class Sensor(models.Model):
     
     def get_name(self):
         return self.name or self.code
+        
+    def __unicode__(self):
+        return self.get_name()
 
 class Data(models.Model):
     
@@ -77,4 +83,4 @@ class Data(models.Model):
     created     = models.DateTimeField(auto_now_add=True)
     
     def __unicode__(self):
-        return self.senser.get_name()
+        return 'Sensor: %s at %s' % (self.sensor.get_name(), 'moment')

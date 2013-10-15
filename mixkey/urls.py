@@ -18,6 +18,8 @@ urlpatterns = patterns('',
     
     url(r'^$', 'domain.views.home', name='home'),
     url(r'^c/$', 'domain.views.data_create', name='data_create'),
+    url(r'^s.php/$', 'domain.views.data_create', name='data_create'),
+    
 )
 
 

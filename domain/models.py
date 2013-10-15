@@ -1,5 +1,7 @@
 from django.db import models
 
+from datetime import datetime, timedelta
+
 TIME_ZONE_CHOICES = (
      (-12.0, '(GMT -12:00) Eniwetok, Kwajalein'),
      (-11.0, '(GMT -11:00) Midway Island, Samoa'),
@@ -64,7 +66,7 @@ class Sensor(models.Model):
     description = models.TextField(blank=True)
     
     created     = models.DateTimeField(auto_now_add=True)
-    
+        
     def get_name(self):
         return self.name or self.code
         
@@ -83,7 +85,18 @@ class Data(models.Model):
     created     = models.DateTimeField(auto_now_add=True)
     
     def get_water_level(self):
-        return self.utrasonic
+        
+        if self.sensor.formula:
+            x = self.utrasonic
+            return eval(self.sensor.formula)
+            
+        else:
+            return self.utrasonic
+    
+    def get_local_created(self):
+        return self.created+ timedelta(hours=self.sensor.project.timezone)
+        print dt
+        print 'cxxccxxcc'
         
     def __unicode__(self):
         return 'Sensor: %s at %s' % (self.sensor.get_name(), 'moment')

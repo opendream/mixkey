@@ -8,7 +8,10 @@
       <th> </th>
       <th>Project</th>
       <th>Sensor</th>
-      <th>Water Level</th>
+      <th>Water Level (cm.)</th>
+      <th>Temperature (&#8451;)</th>
+      <th>Humidity (%)</th>
+      <th>Raingauge (mm.)</th>
       <th>Date Time</th>
     </tr>
   </thead>
@@ -19,7 +22,10 @@
       <td><a href="#">{{ data.sensor.project.get_name }}</a></td>
       <td><a href="#">{{ data.sensor.get_name }}</a></td>
       <td>{{ data.get_water_level }}</td>
-      <td>{{ data.created|date:"Y-m-d H:i:s" }}</td>
+      <td>{{ data.temperature }}</td>
+      <td>{{ data.humidity }}</td>
+      <td>{{ data.raingauge }}</td>
+      <td>{{ data.get_local_created|date:"Y-m-d H:i:s" }}</td>
     </tr>
     {% endfor %}
     

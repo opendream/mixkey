@@ -19,7 +19,7 @@
       <td><a href="#">{{ data.sensor.project.get_name }}</a></td>
       <td><a href="#">{{ data.sensor.get_name }}</a></td>
       <td>{{ data.get_water_level }}</td>
-      <td>{{ data.created }}</td>
+      <td>{{ data.created|date:"Y-m-d H:i:s" }}</td>
     </tr>
     {% endfor %}
     

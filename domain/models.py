@@ -43,8 +43,13 @@ class Project(models.Model):
 
     name        = models.CharField(null=True, max_length=255)
     description = models.TextField(blank=True)
-    
+        
     created     = models.DateTimeField(auto_now_add=True)
+    
+    # For SMS
+    tel_key     = models.CharField(null=True, max_length=255)
+    tel_list    = models.TextField(blank=True)
+    data_dict   = models.TextField(blank=True)
     
     def get_name(self):
         return self.name or self.code
@@ -55,17 +60,24 @@ class Project(models.Model):
     
 class Sensor(models.Model):
     
-    project     = models.ForeignKey(Project) # Required
+    project      = models.ForeignKey(Project) # Required
+                 
+    code         = models.CharField(max_length=255, unique=True) # Required
+    formula      = models.CharField(null=True, max_length=255)
+    lat          = models.FloatField(null=True)
+    lng          = models.FloatField(null=True)
+                 
+    name         = models.CharField(null=True, max_length=255)
+    description  = models.TextField(blank=True)
+                 
+    created      = models.DateTimeField(auto_now_add=True)
     
-    code        = models.CharField(max_length=255, unique=True) # Required
-    formula     = models.CharField(null=True, max_length=255)
-    lat         = models.FloatField(null=True)
-    lng         = models.FloatField(null=True)
-               
-    name        = models.CharField(null=True, max_length=255)
-    description = models.TextField(blank=True)
+    # For rules alert SMS
+    level_read   = models.FloatField(null=True)
+    level_yellow = models.FloatField(null=True)
+    level_green  = models.FloatField(null=True)    
+    data_dict    = models.TextField(blank=True)
     
-    created     = models.DateTimeField(auto_now_add=True)
         
     def get_name(self):
         return self.name or self.code

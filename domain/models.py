@@ -48,7 +48,7 @@ class Project(models.Model):
     created     = models.DateTimeField(auto_now_add=True)
     
     # For SMS
-    tel_key     = models.CharField(null=True, max_length=255)
+    tel_key     = models.CharField(null=True, max_length=255) # not use
     tel_list    = models.TextField(blank=True)
     data_dict   = models.TextField(blank=True)
     
@@ -74,9 +74,9 @@ class Sensor(models.Model):
     created      = models.DateTimeField(auto_now_add=True)
     
     # For rules alert SMS
-    level_read   = models.FloatField(null=True)
+    level_red    = models.FloatField(null=True)
     level_yellow = models.FloatField(null=True)
-    level_green  = models.FloatField(null=True)    
+    level_green  = models.FloatField(null=True) # not use
     data_dict    = models.TextField(blank=True)
     
         
@@ -95,7 +95,7 @@ class Data(models.Model):
     raingauge   = models.FloatField(null=True)
     battery     = models.FloatField(null=True)
     
-    created     = models.DateTimeField(auto_now_add=True)
+    created     = models.DateTimeField()
     
     def get_water_level(self):
         
@@ -112,6 +112,12 @@ class Data(models.Model):
     def __unicode__(self):
         return 'Sensor: %s at %s' % (self.sensor.get_name(), self.get_local_created().strftime("%Y-%m-%d %H:%M:%S"))
         
+    def save(self, *args, **kwargs):
+        super(Data, self).save(*args, **kwargs)
+        from domain.tasks import send_alert
+        send_alert(self)
+        
+        
 class SMSLog(models.Model):
     
     ALERT_RED    = 1
@@ -126,13 +132,14 @@ class SMSLog(models.Model):
     )
     
     project      = models.ForeignKey(Project) # Required
+    sensor       = models.ForeignKey(Sensor, null=True) # use in alert
     
     category = models.IntegerField(choices=CATEGORY_CHOICES, default=DAILY)
     is_send  = models.BooleanField(default=settings.TWILIO_SEND_SMS)
     from_tel = models.CharField(max_length=255)
     to_tel   = models.TextField()
     message  = models.TextField()
-    created  = models.DateTimeField(auto_now_add=True)
+    created  = models.DateTimeField()
     
     message_sid = models.CharField(null=True, max_length=255) # stroe recived message sisd from service
     

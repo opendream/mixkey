@@ -49,7 +49,7 @@ USE_I18N = True
 USE_L10N = False
 
 # If you set this to False, Django will not use timezone-aware datetimes.
-USE_TZ = True
+USE_TZ = False
 
 MEDIA_ROOT = os.path.join(BASE_PATH, 'media')
 MEDIA_URL = '/media/'
@@ -178,12 +178,14 @@ CELERYBEAT_SCHEDULE = {
     },
 }
 
-# TWILIO
+# TWILIO ###############################################################################################################
 TWILIO_SEND_SMS    = True
 TWILIO_ACCOUNT_SID = 'REPLACE ME'
 TWILIO_AUTH_TOKEN  = 'REPLACE ME'
 TWILIO_FROM_NUMBER = 'REPLACE ME'
 
+PREV_DATA_BUFFER_TIME = 10 # miniutes
+MAX_REPEAT_ALERT = 5
 
 
 # DEBUG MODE ##################################################################

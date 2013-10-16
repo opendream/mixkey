@@ -117,6 +117,12 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     
+    # Libs
+    'kombu.transport.django',
+    'djcelery',
+    'djsupervisor',
+    
+    # Project
     'domain',
 )
 
@@ -149,6 +155,27 @@ LOGGING = {
             'propagate': True,
         },
     }
+}
+
+# Celery ###############################################################################################################
+
+import djcelery
+djcelery.setup_loader()
+
+BROKER_BACKEND = "djkombu.transport.DatabaseTransport"
+BROKER_URL = 'django://'
+
+CELERY_IMPORTS = ("domain.tasks", )
+
+from datetime import timedelta
+from celery.schedules import crontab
+
+CELERYBEAT_SCHEDULE = {
+    # ###### RUN EVERYDAY
+    'runs-everyday': {
+        'task': 'domain.tasks.send_alert',
+        'schedule': crontab(hour=22, minute=0),
+    },
 }
 
 

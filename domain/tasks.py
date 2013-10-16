@@ -10,15 +10,23 @@ from twilio.rest import TwilioRestClient
 
 import logging
 
-
+@task()
 def send_sms(project, message_body, category, sensor=None, created=None):
     # Send message to tel list with Twilio
     message = None
-    message_sid = None
+    message_sid = []
     if settings.TWILIO_SEND_SMS:
+        
         client = TwilioRestClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-        message = client.messages.create(body=message_body, to=project.tel_list, from_=settings.TWILIO_FROM_NUMBER)
-        message_sid = message.sid
+        
+        for tel in project.tel_list.split(','):
+            
+            tel = tel.strip()
+            message = client.messages.create(body=message_body, to=tel, from_=settings.TWILIO_FROM_NUMBER)
+            message_sid.append(message.sid)
+        
+        message_sid = ','.join(message_sid)
+        
         
     if not created:
         created = datetime.today()
@@ -92,7 +100,7 @@ def alert_message(category, project, sensor, water_level_median):
 def send_alert(data):
     
     # In case task cant send obj to function
-    if type(data) == int:
+    if type(data) == int or type(data) == long :
         data = Data.objects.get(id=data)
     
     sensor = data.sensor

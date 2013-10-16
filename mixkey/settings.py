@@ -174,7 +174,7 @@ CELERYBEAT_SCHEDULE = {
     # ###### RUN EVERYDAY
     'runs-everyday': {
         'task': 'domain.tasks.send_daily',
-        'schedule': crontab(hour=8, minute=0),
+        'schedule': crontab(hour=4, minute=0),
     },
 }
 

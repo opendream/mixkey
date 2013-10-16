@@ -19,6 +19,9 @@ def send_sms(project, message_body, category, sensor=None, created=None):
         client = TwilioRestClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
         message = client.messages.create(body=message_body, to=project.tel_list, from_=settings.TWILIO_FROM_NUMBER)
         message_sid = message.sid
+        
+    if not created:
+        created = datetime.today()
                     
     SMSLog.objects.create(project=project, sensor=sensor, category=category, is_send=settings.TWILIO_SEND_SMS, from_tel=settings.TWILIO_FROM_NUMBER, to_tel=project.tel_list, message=message_body, message_sid=message_sid, created=created)
     

@@ -110,7 +110,7 @@ class Data(models.Model):
         return self.created + timedelta(hours=self.sensor.project.timezone)
 
     def __unicode__(self):
-        return 'Sensor: %s at %s' % (self.sensor.get_name(), self.get_local_created().strftime("%Y/%m/%d %H:%M:%S"))
+        return 'Sensor: %s at %s' % (self.sensor.get_name(), self.get_local_created().strftime("%Y-%m-%d %H:%M:%S"))
         
 class SMSLog(models.Model):
     
@@ -136,6 +136,9 @@ class SMSLog(models.Model):
     
     message_sid = models.CharField(null=True, max_length=255) # stroe recived message sisd from service
     
+    def get_local_created(self):
+        return self.created + timedelta(hours=self.project.timezone)
+    
     def __unicode__(self):
-        return '[%s] %s' % (self.get_category_display(), self.project.get_name())
+        return '[%s] %s at %s' % (self.get_category_display(), self.project.get_name(), self.get_local_created().strftime("%Y-%m-%d %H:%M:%S"))
     

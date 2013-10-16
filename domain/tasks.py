@@ -10,6 +10,20 @@ from twilio.rest import TwilioRestClient
 
 import logging
 
+
+def send_sms(project, message_body, category):
+    # Send message to tel list with Twilio
+    message = None
+    message_sid = None
+    if settings.TWILIO_SEND_SMS:
+        client = TwilioRestClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+        message = client.messages.create(body=message_body, to=project.tel_list, from_=settings.TWILIO_FROM_NUMBER)
+        message_sid = message.sid
+                    
+    SMSLog.objects.create(project=project, category=category, is_send=settings.TWILIO_SEND_SMS, from_tel=settings.TWILIO_FROM_NUMBER, to_tel=project.tel_list, message=message_body, message_sid=message_sid)
+    
+    return message
+    
 @task()
 def send_daily():
         
@@ -42,11 +56,4 @@ def send_daily():
         message_body = '\n'.join(messages)
         
         
-        # Send message to tel list with Twilio
-        message_sid = None
-        if settings.TWILIO_SEND_SMS:
-            client = TwilioRestClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-            message = client.messages.create(body=message_body, to=project.tel_list, from_=settings.TWILIO_FROM_NUMBER)
-            message_sid = message.sid
-                        
-        SMSLog.objects.create(project=project, category=SMSLog.DAILY, is_send=settings.TWILIO_SEND_SMS, from_tel=settings.TWILIO_FROM_NUMBER, to_tel=project.tel_list, message=message_body, message_sid=message_sid)
+        send_sms(project, message_body, SMSLog.DAILY)

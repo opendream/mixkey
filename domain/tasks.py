@@ -1,18 +1,18 @@
 from django.conf import settings
 from django.db.models import Q
 
-from domain.models import Project, Data
+from domain.models import Project, Data, SMSLog
 
 from celery.decorators import task
 from datetime import date, time, datetime, timedelta
 
+from twilio.rest import TwilioRestClient
+
 import logging
 
-#@task()
-def send_alert():
-    
-    #logging.debug('START send_alert')
-    
+@task()
+def send_daily():
+        
     # Send notiy sms daily
     project_list = Project.objects.exclude((Q(tel_key__isnull=True) | Q(tel_key__exact='') | Q(tel_key='') | Q(tel_key='0')) | (Q(tel_list__isnull=True) | Q(tel_list__exact='') | Q(tel_list='') | Q(tel_list='0')))
     
@@ -39,12 +39,14 @@ def send_alert():
             else:
                 messages.append('Sensor %s -- no data recorded, something problems, please check the sensor.' % (sensor.get_name()))
                 
-        message_text = '\n'.join(messages)
+        message_body = '\n'.join(messages)
         
-        print message_text
         
-        # TODO send message to tel list
-        # project.tel_key
-        # project.tel_list
-    
-    #logging.debug('END send_alert')
+        # Send message to tel list with Twilio
+        message_sid = None
+        if settings.TWILIO_SEND_SMS:
+            client = TwilioRestClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+            message = client.messages.create(body=message_body, to=project.tel_list, from_=settings.TWILIO_FROM_NUMBER)
+            message_sid = message.sid
+                        
+        SMSLog.objects.create(project=project, category=SMSLog.DAILY, is_send=settings.TWILIO_SEND_SMS, from_tel=settings.TWILIO_FROM_NUMBER, to_tel=project.tel_list, message=message_body, message_sid=message_sid)

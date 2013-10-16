@@ -173,10 +173,17 @@ from celery.schedules import crontab
 CELERYBEAT_SCHEDULE = {
     # ###### RUN EVERYDAY
     'runs-everyday': {
-        'task': 'domain.tasks.send_alert',
+        'task': 'domain.tasks.send_daily',
         'schedule': crontab(hour=8, minute=0),
     },
 }
+
+# TWILIO
+TWILIO_SEND_SMS    = True
+TWILIO_ACCOUNT_SID = 'REPLACE ME'
+TWILIO_AUTH_TOKEN  = 'REPLACE ME'
+TWILIO_FROM_NUMBER = 'REPLACE ME'
+
 
 
 # DEBUG MODE ##################################################################

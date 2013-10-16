@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 from datetime import datetime, timedelta
 
@@ -106,9 +107,35 @@ class Data(models.Model):
             return self.utrasonic
     
     def get_local_created(self):
-        return self.created+ timedelta(hours=self.sensor.project.timezone)
-        print dt
-        print 'cxxccxxcc'
-        
+        return self.created + timedelta(hours=self.sensor.project.timezone)
+
     def __unicode__(self):
-        return 'Sensor: %s at %s' % (self.sensor.get_name(), 'moment')
+        return 'Sensor: %s at %s' % (self.sensor.get_name(), self.get_local_created().strftime("%Y/%m/%d %H:%M:%S"))
+        
+class SMSLog(models.Model):
+    
+    ALERT_RED    = 1
+    ALERT_YELLOW = 2
+    ALERT_GREEN  = 3
+    DAILY        = 4
+    CATEGORY_CHOICES = (
+        (ALERT_RED, 'Alert Red'), 
+        (ALERT_YELLOW, 'Alert Yellow'), 
+        (ALERT_GREEN, 'Alert Green'), 
+        (DAILY, 'Daily')
+    )
+    
+    project      = models.ForeignKey(Project) # Required
+    
+    category = models.IntegerField(choices=CATEGORY_CHOICES, default=DAILY)
+    is_send  = models.BooleanField(default=settings.TWILIO_SEND_SMS)
+    from_tel = models.CharField(max_length=255)
+    to_tel   = models.TextField()
+    message  = models.TextField()
+    created  = models.DateTimeField(auto_now_add=True)
+    
+    message_sid = models.CharField(null=True, max_length=255) # stroe recived message sisd from service
+    
+    def __unicode__(self):
+        return '[%s] %s' % (self.get_category_display(), self.project.get_name())
+    

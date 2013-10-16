@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+python manage.py supervisor stop all
+python manage.py supervisor shutdown
+kill `lsof -t -i:8081`
+/etc/init.d/nginx stop
+#django-admin.py compilemessages
+python ./manage.py runfcgi host=127.0.0.1 port=8081 --settings=mixkey.settings
+
+/etc/init.d/nginx start
+python manage.py supervisor -d --noreload
+

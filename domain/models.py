@@ -124,10 +124,10 @@ class SMSLog(models.Model):
     ALERT_GREEN  = 3
     DAILY        = 4
     CATEGORY_CHOICES = (
-        (ALERT_RED, 'Alert Red'), 
-        (ALERT_YELLOW, 'Alert Yellow'), 
-        (ALERT_GREEN, 'Alert Green'), 
-        (DAILY, 'Daily')
+        (ALERT_RED, 'RED'), 
+        (ALERT_YELLOW, 'YELLOW'), 
+        (ALERT_GREEN, 'GREEN'), 
+        (DAILY, 'DAILY')
     )
     
     project      = models.ForeignKey(Project) # Required

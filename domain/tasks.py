@@ -41,7 +41,10 @@ def send_daily():
     for project in project_list:
 
         
-        messages = ['Daily update from telemetry station util yesterday midnight.']
+        messages = [
+            'Daily update from telemetry station util yesterday midnight.',
+            'Project: %s' % project.get_name()
+        ]
         
         for sensor in project.sensor_set.all():
             
@@ -49,7 +52,7 @@ def send_daily():
             water_level_list = [data.get_water_level() for data in data_list]
             
             if water_level_list:
-                messages.append('Sensor %s -- max: %s, min: %s, average: %s' % (sensor.get_name(), max(water_level_list), min(water_level_list), float(sum(water_level_list))/len(water_level_list)))
+                messages.append('Sensor %s -- max: %s cm, min: %s cm, average: %s cm' % (sensor.get_name(), max(water_level_list), min(water_level_list), float(sum(water_level_list))/len(water_level_list)))
             else:
                 messages.append('Sensor %s -- no data recorded, something problems, please check the sensor.' % (sensor.get_name()))
                 
@@ -72,6 +75,14 @@ def count_log_category(log_list, category):
         if log.category == category:
             count = count + 1
     return count
+    
+def alert_message(category, project, sensor, water_level_median):
+    
+    return '\n'.join([
+        '[%s CODE] from telemetry station' % SMSLog(category=category).get_category_display(),
+        'Project: %s' % project.get_name(),
+        'Sensor %s -- water level: %s cm' % (sensor.get_name(), water_level_median)     
+    ])
     
     
 @task()
@@ -115,19 +126,19 @@ def send_alert(data):
     # Red code alert limit in 5 times
     if water_level_median >= sensor.level_red:
         if count_log_category(log_list[0: settings.MAX_REPEAT_ALERT], SMSLog.ALERT_RED) < settings.MAX_REPEAT_ALERT:
-            send_sms(project, '', SMSLog.ALERT_RED, sensor, data.created)
+            send_sms(project, alert_message(SMSLog.ALERT_RED, project, sensor, water_level_median), SMSLog.ALERT_RED, sensor, data.created)
             
     # Red code alert limit in 5 times        
     elif water_level_median >= sensor.level_yellow and water_level_median < sensor.level_red:
         if count_log_category(log_list[0: settings.MAX_REPEAT_ALERT], SMSLog.ALERT_YELLOW) < settings.MAX_REPEAT_ALERT:
-            send_sms(project, '', SMSLog.ALERT_YELLOW, sensor, data.created)
+            send_sms(project, alert_message(SMSLog.ALERT_YELLOW, project, sensor, water_level_median), SMSLog.ALERT_YELLOW, sensor, data.created)
             
     else:
         try:
             latest_category = SMSLog.objects.filter(sensor=sensor).order_by('-created')[0].category
             
             if latest_category == SMSLog.ALERT_RED or latest_category == SMSLog.ALERT_YELLOW:
-                send_sms(project, '', SMSLog.ALERT_GREEN, sensor, data.created)
+                send_sms(project, alert_message(SMSLog.ALERT_GREEN, project, sensor, water_level_median), SMSLog.ALERT_GREEN, sensor, data.created)
         
         except IndexError:
             pass

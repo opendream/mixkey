@@ -42,10 +42,10 @@ def send_daily():
     project_list = Project.objects.exclude(Q(tel_list__isnull=True) | Q(tel_list__exact='') | Q(tel_list='') | Q(tel_list='0'))
     
     # For production
-    # yesterday_midnight = datetime.combine(date.today(), time(23, 59, 59))-timedelta(days=1)
+    yesterday_midnight = datetime.combine(date.today(), time(23, 59, 59))-timedelta(days=1)
     
     # For test in todat midnight
-    yesterday_midnight = datetime.combine(date.today(), time(23, 59, 59))
+    #yesterday_midnight = datetime.combine(date.today(), time(23, 59, 59))
     
     yesterday = yesterday_midnight-timedelta(days=1)
     

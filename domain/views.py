@@ -19,7 +19,13 @@ def data_create(request):
     
     # Prepare data
     
-    project = request.GET.get('P') or request.GET.get('p') or 'unknow'
+    project = request.GET.get('P') or request.GET.get('p') or 'UNKNOW'
+    
+    # Hot fixed hard code
+    if project == 'SLKK':
+        project = 'SLK'
+    # End hot fixed
+    
     project, created = Project.objects.get_or_create(code=project)
     
     sensor = request.GET.get('M') or request.GET.get('m') or request.GET.get('S') or request.GET.get('s')

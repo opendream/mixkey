@@ -49,8 +49,8 @@ class Project(models.Model):
     
     # For SMS
     tel_key     = models.CharField(null=True, max_length=255) # not use
-    tel_list    = models.TextField(blank=True)
-    data_dict   = models.TextField(blank=True)
+    tel_list    = models.TextField(null=True, blank=True)
+    data_dict   = models.TextField(null=True, blank=True)
     
     def get_name(self):
         return self.name or self.code
@@ -69,15 +69,14 @@ class Sensor(models.Model):
     lng          = models.FloatField(null=True)
                  
     name         = models.CharField(null=True, max_length=255)
-    description  = models.TextField(blank=True)
+    description  = models.TextField(null=True, blank=True)
                  
     created      = models.DateTimeField(auto_now_add=True)
     
     # For rules alert SMS
     level_red    = models.FloatField(null=True)
     level_yellow = models.FloatField(null=True)
-    level_green  = models.FloatField(null=True) # not use
-    data_dict    = models.TextField(blank=True)
+    data_dict    = models.TextField(null=True, blank=True)
     
         
     def get_name(self):

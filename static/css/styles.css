@@ -53,3 +53,7 @@ body {
     font-weight: bold;
     font-size: 23px;
 }
+
+ul.select-unit {
+    width: 180px;
+}

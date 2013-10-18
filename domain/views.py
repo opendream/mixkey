@@ -20,7 +20,7 @@ def project_overview(request):
     # Summary
     project_list = []
     
-    for project in Project.objects.all():
+    for project in Project.objects.all().order_by('-created'):
         
         sensor_list = []
         
@@ -32,11 +32,12 @@ def project_overview(request):
             except IndexError:
                 pass
             
-            sensor_list.append((sensor, data))
+            if data:
+                sensor_list.append((sensor, data))
+        
+        if sensor_list:   
+            project_list.append((project, sensor_list))
             
-        project_list.append((project, sensor_list))
-        
-        
     return render(request, 'project_overview.html', {'data_list': data_list, 'project_list': project_list})
     
 def data_create(request):

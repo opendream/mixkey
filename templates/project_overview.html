@@ -6,9 +6,13 @@
 
 {% for project, sensor_list in project_list %}
   
+  {% if sensor_list %}
+  
   <h2 class="project-title">{{ project.get_name }}</h2>
   {% if project.description %}
   <p>{{ project.description }}</p>
+  {% endif %}
+  
   {% endif %}
   
   {% for sensor, data in sensor_list  %}    

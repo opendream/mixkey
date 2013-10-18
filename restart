@@ -1,9 +1,9 @@
-python manage.py supervisor stop all
-python manage.py supervisor shutdown
+#python manage.py supervisor stop all
+#python manage.py supervisor shutdown
 sudo kill `lsof -t -i:8081`
 sudo /etc/init.d/nginx stop
 #django-admin.py compilemessages
 python ./manage.py runfcgi host=127.0.0.1 port=8081 --settings=mixkey.settings
 
 sudo /etc/init.d/nginx start
-python manage.py supervisor -d --noreload
+#python manage.py supervisor -d --noreload

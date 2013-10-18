@@ -114,7 +114,8 @@ class Data(models.Model):
     def save(self, *args, **kwargs):
         super(Data, self).save(*args, **kwargs)
         from domain.tasks import send_alert
-        send_alert.delay(self.id)
+        #send_alert.delay(self.id)
+        send_alert(self.id)
         
         
 class SMSLog(models.Model):

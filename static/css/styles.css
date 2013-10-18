@@ -1,0 +1,55 @@
+body {
+    padding-top: 70px;
+}
+
+.project-title {
+    font-size: 24px;
+    margin-top: 40px;
+}
+.realtime-pannel {
+    margin-top: 60px;
+}
+
+.label-category-code {
+    float: right;
+    padding-bottom: 0.1em;
+}
+
+.sensor-current {
+    min-width: 595px;
+}
+.sensor-current .panel-body {
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-right: 0;
+}
+
+.sensor-current .table {
+    margin-bottom: 0;
+}
+
+.sensor-current th {
+    color: #555;
+}
+.data-field {
+    display: block;
+    float: left;
+}
+.data-primary-field {
+    width: 150px;
+    height: 74px;
+}
+.data-other-field {
+    width: calc(100% - 150px);
+    border-left: 1px solid #DDD;
+    
+}
+.data-primary-field-label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+}
+.data-primary-field-value {
+    font-weight: bold;
+    font-size: 23px;
+}

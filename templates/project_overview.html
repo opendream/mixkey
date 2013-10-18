@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% load domain_tags %}
+
+{% block content %}
+
+{% for project, sensor_list in project_list %}
+  
+  <h2 class="project-title">{{ project.get_name }}</h2>
+  {% if project.description %}
+  <p>{{ project.description }}</p>
+  {% endif %}
+  
+  {% for sensor, data in sensor_list  %}    
+    
+    <div class="panel panel-{{ data.get_category|category_to_class }} sensor-current">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          <a href='#'>Sensor - {{ sensor.get_name }}</a>
+          <div class="label-category-code label label-{{ data.get_category|category_to_class }}">{{ data.get_category}} CODE</div>
+        </h3>
+      </div>
+      <div class="panel-body">
+        <div class="data-field data-primary-field">
+          <h4 class="data-primary-field-label">Water Level</h4>
+          <div class="data-primary-field-value">{{ data.get_water_level }} cm.</div>          
+        </div>
+        <div class="data-field data-other-field">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th> </th>
+                <th>Temperature (&#8451;)</th>
+                <th>Humidity (%)</th>
+                <th>Raingauge (mm.)</th>
+                <th>Date Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td> </td>
+                <td>{{ data.temperature }}</td>
+                <td>{{ data.humidity }}</td>
+                <td>{{ data.raingauge }}</td>
+                <td>{{ data.get_local_created|date:"Y-m-d H:i:s" }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+      </div>
+    </div>
+          
+          
+  {% endfor %}
+{% endfor %}
+
+
+<div class="realtime-pannel panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading"><h4>Real-time Data</h4></div>
+  <div class="panel-body">
+    <p>This raw data received from sensors name are Mixkey, received every minutes in each sensors and order by newest first.</p>
+  </div>
+  
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th> </th>
+        <th>Project</th>
+        <th>Sensor</th>
+        <th>Water Level (cm.)</th>
+        <th>Temperature (&#8451;)</th>
+        <th>Humidity (%)</th>
+        <th>Raingauge (mm.)</th>
+        <th>Date Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for data in data_list %}  
+      <tr>
+        <td> </td>
+        <td><a href="#">{{ data.sensor.project.get_name }}</a></td>
+        <td><a href="#">{{ data.sensor.get_name }}</a></td>
+        <td>{{ data.get_water_level }}</td>
+        <td>{{ data.temperature }}</td>
+        <td>{{ data.humidity }}</td>
+        <td>{{ data.raingauge }}</td>
+        <td>{{ data.get_local_created|date:"Y-m-d H:i:s" }}</td>
+      </tr>
+      {% endfor %}
+    
+    </tbody>
+  </table>
+
+</div>
+
+{% endblock %}

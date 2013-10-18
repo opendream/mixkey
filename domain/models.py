@@ -37,6 +37,17 @@ TIME_ZONE_CHOICES = (
      (12.0, '(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka')
 )
 
+ALERT_RED    = 1
+ALERT_YELLOW = 2
+ALERT_GREEN  = 3
+DAILY        = 4
+CATEGORY_CHOICES = (
+    (ALERT_RED, 'RED'), 
+    (ALERT_YELLOW, 'YELLOW'), 
+    (ALERT_GREEN, 'GREEN'), 
+    (DAILY, 'DAILY')
+)
+
 class Project(models.Model):
     
     code        = models.CharField(max_length=255, unique=True) # Required
@@ -104,6 +115,18 @@ class Data(models.Model):
             
         else:
             return self.utrasonic
+            
+    def get_category(self):
+        
+        sensor = self.sensor
+        water_level = self.get_water_level()
+        
+        if water_level >= sensor.level_red:
+            return 'RED'
+        elif water_level >= sensor.level_yellow and water_level < sensor.level_red:
+            return 'YELLOW'
+
+        return 'GREEN' 
     
     def get_local_created(self):
         return self.created + timedelta(hours=self.sensor.project.timezone)

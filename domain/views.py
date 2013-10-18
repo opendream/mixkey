@@ -6,14 +6,38 @@ from domain.models import Project, Sensor, Data
 from datetime import datetime
 
 def home(request):
+    return project_overview(request)
+    
+
+def project_overview(request):
     
     if request.GET.get('M') or request.GET.get('m') or request.GET.get('S') or request.GET.get('s'):
         return data_create(request)
     
     data_list = Data.objects.all().order_by('-created')[0:30]
+    
+    
+    # Summary
+    project_list = []
+    
+    for project in Project.objects.all():
+        
+        sensor_list = []
+        
+        for sensor in project.sensor_set.all():
+                        
+            data = False
+            try:
+                data = sensor.data_set.order_by('-created')[0]
+            except IndexError:
+                pass
+            
+            sensor_list.append((sensor, data))
+            
+        project_list.append((project, sensor_list))
         
         
-    return render(request, 'home.html', {'data_list': data_list})
+    return render(request, 'project_overview.html', {'data_list': data_list, 'project_list': project_list})
     
 def data_create(request):
     

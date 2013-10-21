@@ -4,13 +4,22 @@
 
 {% block content %}
 
-<h1>{% if project_selected %}Latest Update{% else %}All Projects{% endif %}</h1>
+
+<h1>
+  {% if sensor_selected %}
+  <a href="{% url 'project_overview' sensor_selected.project.code.lower %}">[{{ project_selected.get_name }}]</a> Sensor - {{ sensor_selected.get_name }}
+  {% elif project_selected %}
+  Latest Update
+  {% else %}
+  All Projects
+  {% endif %}
+</h1>
 
 
 {% for project, sensor_list in project_list %}
   
   {% if not project_selected %}
-  <h2 class="project-title">{{ project.get_name }}</h2>
+  <h2 class="project-title">{{ project.get_name }}<a class="label-active-project" href="{% url 'project_overview' project.code.lower %}">[Active to this project]</a></h2>
   {% endif %}
   
   {% if project.description %}
@@ -22,7 +31,11 @@
     <div class="panel panel-{{ data.get_category|category_to_class }} sensor-current">
       <div class="panel-heading">
         <h3 class="panel-title">
-          <a href='#'>Sensor - {{ sensor.get_name }}</a>
+          {% if sensor_selected %}
+          Sensor - {{ sensor.get_name }}
+          {% else %}
+          <a href="{% url 'sensor_overview' sensor.project.code.lower sensor.code.lower %}">Sensor - {{ sensor.get_name }}</a>
+          {% endif %}
           <div class="label-category-code label label-{{ data.get_category|category_to_class }}">{{ data.get_category}} CODE</div>
         </h3>
       </div>
@@ -65,9 +78,11 @@
 <div class="realtime-pannel panel panel-default">
   <!-- Default panel contents -->
   <div class="panel-heading"><h4>Real-time Data</h4></div>
+  {% if not sensor_selected %}
   <div class="panel-body">
     <p>This raw data received from sensors name are Mixkey, received every minutes in each sensors and order by newest first.</p>
   </div>
+  {% endif %}
   
   <table class="table table-striped">
     <thead>
@@ -76,7 +91,9 @@
         {% if not project_selected %}
         <th>Project</th>
         {% endif %}
+        {% if not sensor_selected %}
         <th>Sensor</th>
+        {% endif %}
         <th>Water Level MSL (m.)</th>
         <th>Temperature (&#8451;)</th>
         <th>Humidity (%)</th>
@@ -90,9 +107,11 @@
       <tr>
         <td> </td>
         {% if not project_selected %}
-        <td><a href="#">{{ data.sensor.project.get_name }}</a></td>
+        <td><a href="{% url 'project_overview' data.sensor.project.code.lower %}">{{ data.sensor.project.get_name }}</a></td>
         {% endif %}
-        <td><a href="#">{{ data.sensor.get_name }}</a></td>
+        {% if not sensor_selected %}
+        <td><a href="{% url 'sensor_overview' data.sensor.project.code.lower data.sensor.code.lower %}">{{ data.sensor.get_name }}</a></td>
+        {% endif %}
         <td>{{ data.get_water_level }}</td>
         <td>{{ data.temperature }}</td>
         <td>{{ data.humidity }}</td>

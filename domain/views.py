@@ -6,15 +6,17 @@ from domain.models import Project, Sensor, Data
 from datetime import datetime
 
 def home(request):
-    return project_overview(request)
-    
-
-def project_overview(request, project_code=False):
-    
     # For mixkey create record
     if request.GET.get('M') or request.GET.get('m') or request.GET.get('S') or request.GET.get('s'):
         return data_create(request)
         
+    return project_overview(request)
+
+def sensor_overview(request, project_code, sensor_code):
+    return project_overview(request, project_code, sensor_code)
+    
+
+def project_overview(request, project_code=False, sensor_code=False):        
         
     project_selected = request.META.get('PROJECT_SELECTED')
     
@@ -23,11 +25,19 @@ def project_overview(request, project_code=False):
     else:
         project_query = Project.objects.all().order_by('-created')
         
-
+    
+    sensor_selected = None
+    
     # List all data list
     data_list = Data.objects.all().order_by('-created')
     if project_selected:
         data_list = data_list.filter(sensor__project=project_selected)
+        
+        try:
+            if sensor_code:
+                sensor_selected = Sensor.objects.get(project=project_selected, code=sensor_code)
+        except Sensor.DoesNotExist:
+            pass
         
     data_list = data_list[0:30]
 
@@ -39,7 +49,12 @@ def project_overview(request, project_code=False):
         
         sensor_list = []
         
-        for sensor in project.sensor_set.all():
+        if sensor_selected:
+            sensor_query = [sensor_selected]
+        else:
+            sensor_query = project.sensor_set.all()
+        
+        for sensor in sensor_query:
                         
             data = False
             try:
@@ -53,13 +68,12 @@ def project_overview(request, project_code=False):
         if sensor_list:   
             project_list.append((project, sensor_list))
         
-    return render(request, 'project_overview.html', {
+    return render(request, 'overview.html', {
         'data_list': data_list, 
-        'project_list': project_list, 
+        'project_list': project_list,
+        'sensor_selected': sensor_selected
     })
 
-def sensor_overview(request, project_code, sensor_code):
-    pass
     
 def data_create(request):
     

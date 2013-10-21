@@ -9,6 +9,10 @@ class ProjectMiddleware(object):
     
     def process_view(self, request, view_func, view_args, view_kwargs):
         
+        # ignore case
+        if request.path.split('/')[1] in ['admin']:
+            return None
+        
         project_code = view_kwargs.get('project_code') or ''
         self.project_code = project_code
         
@@ -44,6 +48,7 @@ class ProjectMiddleware(object):
         return None
         
     def process_response(self, request, response):
+        
         
         if self.project_code.lower() == 'all':
             response = redirect('home')

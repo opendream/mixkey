@@ -55,13 +55,13 @@ class Project(models.Model):
     code        = models.CharField(max_length=255, unique=True) # Required
     timezone    = models.FloatField(choices=TIME_ZONE_CHOICES, default=0.0)
 
-    name        = models.CharField(null=True, max_length=255)
-    description = models.TextField(blank=True)
+    name        = models.CharField(null=True, blank=True, max_length=255)
+    description = models.TextField(null=True, blank=True)
         
     created     = models.DateTimeField(auto_now_add=True)
     
     # For SMS
-    tel_key     = models.CharField(null=True, max_length=255) # not use
+    tel_key     = models.CharField(null=True, blank=True, max_length=255) # not use
     tel_list    = models.TextField(null=True, blank=True)
     data_dict   = models.TextField(null=True, blank=True)
     
@@ -77,23 +77,44 @@ class Sensor(models.Model):
     project      = models.ForeignKey(Project) # Required
                  
     code         = models.CharField(max_length=255, unique=True) # Required
-    formula      = models.CharField(null=True, max_length=255)
-    lat          = models.FloatField(null=True)
-    lng          = models.FloatField(null=True)
+    formula      = models.CharField(null=True, blank=True, max_length=255)
+    lat          = models.FloatField(null=True, blank=True)
+    lng          = models.FloatField(null=True, blank=True)
                  
-    name         = models.CharField(null=True, max_length=255)
+    name         = models.CharField(null=True, blank=True, max_length=255)
     description  = models.TextField(null=True, blank=True)
                  
     created      = models.DateTimeField(auto_now_add=True)
     
     # For rules alert SMS
-    level_red    = models.FloatField(null=True)
-    level_yellow = models.FloatField(null=True)
+    level_red    = models.FloatField(null=True, blank=True)
+    level_yellow = models.FloatField(null=True, blank=True)
     data_dict    = models.TextField(null=True, blank=True)
+    
+    # For SMS
+    tel_key     = models.CharField(null=True, blank=True, max_length=255) # not use
+    tel_list    = models.TextField(null=True, blank=True)
     
         
     def get_name(self):
         return self.name or self.code
+        
+    def get_category(self):
+        
+        water_level = 0
+        
+        try:
+            data = Data.objects.order_by('-created')[0]
+            water_level = data.get_water_level()
+        except Data.DoesNotExist:
+            pass
+        
+        if water_level >= self.level_red:
+            return 'RED'
+        elif water_level >= self.level_yellow and water_level < self.level_red:
+            return 'YELLOW'
+
+        return 'GREEN'
         
     def __unicode__(self):
         return self.get_name()
@@ -102,10 +123,10 @@ class Data(models.Model):
     
     sensor      = models.ForeignKey(Sensor)
     utrasonic   = models.IntegerField()          # Required
-    temperature = models.FloatField(null=True)
-    humidity    = models.IntegerField(null=True)
-    raingauge   = models.FloatField(null=True)
-    battery     = models.FloatField(null=True)
+    temperature = models.FloatField(null=True, blank=True)
+    humidity    = models.IntegerField(null=True, blank=True)
+    raingauge   = models.FloatField(null=True, blank=True)
+    battery     = models.FloatField(null=True, blank=True)
     
     created     = models.DateTimeField()
     

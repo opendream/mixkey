@@ -4,9 +4,15 @@
 
 {% block content %}
 
+<h1>{% if project_selected %}Latest Update{% else %}All Projects{% endif %}</h1>
+
+
 {% for project, sensor_list in project_list %}
-    
+  
+  {% if not project_selected %}
   <h2 class="project-title">{{ project.get_name }}</h2>
+  {% endif %}
+  
   {% if project.description %}
   <p>{{ project.description }}</p>
   {% endif %}
@@ -67,7 +73,9 @@
     <thead>
       <tr>
         <th> </th>
+        {% if not project_selected %}
         <th>Project</th>
+        {% endif %}
         <th>Sensor</th>
         <th>Water Level (cm.)</th>
         <th>Temperature (&#8451;)</th>
@@ -80,7 +88,9 @@
       {% for data in data_list %}  
       <tr>
         <td> </td>
+        {% if not project_selected %}
         <td><a href="#">{{ data.sensor.project.get_name }}</a></td>
+        {% endif %}
         <td><a href="#">{{ data.sensor.get_name }}</a></td>
         <td>{{ data.get_water_level }}</td>
         <td>{{ data.temperature }}</td>

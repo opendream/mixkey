@@ -38,14 +38,23 @@
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">All Projects <b class="caret"></b></a>
+              
+              {% if project_selected  %}
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ project_selected.get_name }} <b class="caret"></b></a>
+              {% else %}
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">All projects <b class="caret"></b></a>
+              {% endif %}
+              
               <ul class="dropdown-menu select-project">
-                <li><a href="#">All projects</a></li>
+
+                <li><a href="{% url 'home' %}">All projects</a></li>                
                 <li class="divider"></li>
                 <li class="dropdown-header">Select Project</li>
                                 
                 {% for project in global_project_list %}
-                <li><a href="#">{{ project.get_name }}</a></li>
+                <li{% if project == project_selected %} class="active"{% endif %}>
+                  <a href="{% url 'project_overview' project.code.lower %}">{{ project.get_name }}</a>
+                </li>
                 {% endfor %}
               
               </ul>
@@ -64,19 +73,6 @@
     </div>
     
     <div class="container">
-      
-      <div class="hero-unit">
-        <h1>All Projects</h1>
-        <!--
-        <p>Data hub for store multiple projects from Mix Key</p>
-        <p>
-          <a class="btn btn-primary btn-large" href="#about">
-            Learn more
-          </a>
-        </p>
-        -->
-        
-      </div>
       
       <div class="main-content">
       {% block content %}{% endblock %}

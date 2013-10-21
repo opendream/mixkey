@@ -19,9 +19,15 @@ urlpatterns = patterns('',
     url(r'^$', 'domain.views.home', name='home'),
     url(r'^c/$', 'domain.views.data_create', name='data_create'),
     
+    
     # Deprecate 
     url(r'^s.php$', 'domain.views.data_create'),
     url(r'^s.php/$', 'domain.views.data_create'),
+    
+    
+    # Force to order end
+    url(r'^(?P<project_code>[A-Za-z0-9_-]+)/$', 'domain.views.project_overview', name='project_overview'),
+    
     
 )
 

@@ -112,7 +112,7 @@
         {% if not sensor_selected %}
         <td><a href="{% url 'sensor_overview' data.sensor.project.code.lower data.sensor.code.lower %}">{{ data.sensor.get_name }}</a></td>
         {% endif %}
-        <td>{{ data.get_water_level }}</td>
+        <td>{{ data.get_water_level|cm2m }}</td>
         <td>{{ data.temperature }}</td>
         <td>{{ data.humidity }}</td>
         <td>{{ data.raingauge }}</td>

@@ -16,3 +16,8 @@ def category_to_class(category):
         return map_class[category.lower()]
     except:
         return 'default'
+
+
+@register.filter(name='cm2m')        
+def cm2m(value):
+    return round(value/100, 2)

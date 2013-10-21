@@ -1,6 +1,8 @@
 from django.db import models
 from django.conf import settings
 
+from domain.functions import median
+
 from datetime import datetime, timedelta
 
 TIME_ZONE_CHOICES = (
@@ -107,7 +109,7 @@ class Data(models.Model):
     
     created     = models.DateTimeField()
     
-    def get_water_level(self):
+    def get_water_level_raw(self):
         
         if self.sensor.formula:
             x = self.utrasonic
@@ -115,9 +117,20 @@ class Data(models.Model):
             
         else:
             water_level = self.utrasonic
-            
-        # Convert to m.
-        return round(water_level/100, 2)
+        
+        return water_level
+        
+        
+    def get_water_level(self):
+                
+        # List of the data previous in 10 miniutes
+        time_prev_check = self.created-timedelta(minutes=settings.PREV_DATA_BUFFER_TIME)
+    
+        data_list = self.sensor.data_set.filter(created__gte=time_prev_check, created__lte=self.created).order_by('-created')
+        water_level_list = [d.get_water_level_raw() for d in data_list]
+        return median(water_level_list)
+    
+
             
     def get_category(self):
         

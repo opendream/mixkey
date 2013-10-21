@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db.models import Q
 
 from domain.models import Project, Data, SMSLog
+from domain.templatetags.domain_tags import cm2m
 
 from celery.decorators import task
 from datetime import date, time, datetime, timedelta
@@ -63,7 +64,7 @@ def send_daily():
             water_level_list = [data.get_water_level() for data in data_list]
             
             if water_level_list:
-                messages.append('Sensor %s -- max: %s m., min: %s m., average: %s m.' % (sensor.get_name(), max(water_level_list), min(water_level_list), float(sum(water_level_list))/len(water_level_list)))
+                messages.append('Sensor %s -- max: %s m., min: %s m., average: %s m.' % (sensor.get_name(), cm2m(max(water_level_list)), cm2m(min(water_level_list)), cm2m(float(sum(water_level_list))/len(water_level_list))))
             else:
                 messages.append('Sensor %s -- no data recorded, something problems, please check the sensor.' % (sensor.get_name()))
                 
@@ -72,13 +73,7 @@ def send_daily():
         
         send_sms(project, message_body, SMSLog.DAILY)
         
-def median(mylist):
 
-    sorts = sorted(mylist)
-    length = len(sorts)
-    if not length % 2:
-        return (sorts[length / 2] + sorts[length / 2 - 1]) / 2.0
-    return sorts[length / 2]
 
 def count_log_category(log_list, category):
     count = 0
@@ -92,7 +87,7 @@ def alert_message(category, project, sensor, water_level_median):
     return '\n'.join([
         '[%s CODE] from telemetry station' % SMSLog(category=category).get_category_display(),
         'Project: %s -- report reference from MSL.' % project.get_name(),
-        'Sensor %s -- water level: %s m.' % (sensor.get_name(), water_level_median)     
+        'Sensor %s -- water level: %s m.' % (sensor.get_name(), cm2m(water_level_median))     
     ])
     
     
@@ -118,16 +113,9 @@ def send_alert(data):
             
     
     project = data.sensor.project
-    water_level = data.get_water_level()
+    water_level_median = data.get_water_level()
     
-    
-    # List of the data previous in 10 miniutes
-    time_prev_check = data.created-timedelta(minutes=settings.PREV_DATA_BUFFER_TIME)
-    
-    data_list = sensor.data_set.filter(created__gte=time_prev_check, created__lte=data.created).order_by('-created')
-    water_level_list = [d.get_water_level() for d in data_list]
-    
-    water_level_median = median(water_level_list)
+    #water_level_median = median(water_level_list)
   
     # List of repeat sms send in same category
     #time_prev_check_repeat = data.created-timedelta(minutes=settings.PREV_DATA_BUFFER_TIME*(settings.MAX_REPEAT_ALERT))

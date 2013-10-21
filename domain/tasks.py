@@ -24,7 +24,7 @@ def send_sms(project, message_body, category, sensor=None, created=None):
         if sensor:
             tel_list = sensor.tel_list.split(',')
         else:
-            tel_list = project.tel_list.split(','):
+            tel_list = project.tel_list.split(',')
             
         for tel in tel_list:
             

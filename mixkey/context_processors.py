@@ -8,7 +8,7 @@ def site_information(request):
     context = {
         'settings':settings,
         'global_project_list': Project.objects.all().order_by('-created'),
-        'project_selected': request.META['PROJECT_SELECTED'],
+        'project_selected': request.META.get('PROJECT_SELECTED'),
     }
 
     return context

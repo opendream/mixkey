@@ -54,7 +54,7 @@ def send_daily():
         
         messages = [
             'Daily update from telemetry station util yesterday midnight.',
-            'Project: %s' % project.get_name()
+            'Project: %s -- report reference from MSL.' % project.get_name()
         ]
         
         for sensor in project.sensor_set.all():
@@ -63,7 +63,7 @@ def send_daily():
             water_level_list = [data.get_water_level() for data in data_list]
             
             if water_level_list:
-                messages.append('Sensor %s -- max: %s cm, min: %s cm, average: %s cm' % (sensor.get_name(), max(water_level_list), min(water_level_list), float(sum(water_level_list))/len(water_level_list)))
+                messages.append('Sensor %s -- max: %s m., min: %s m., average: %s m.' % (sensor.get_name(), max(water_level_list), min(water_level_list), float(sum(water_level_list))/len(water_level_list)))
             else:
                 messages.append('Sensor %s -- no data recorded, something problems, please check the sensor.' % (sensor.get_name()))
                 
@@ -91,8 +91,8 @@ def alert_message(category, project, sensor, water_level_median):
     
     return '\n'.join([
         '[%s CODE] from telemetry station' % SMSLog(category=category).get_category_display(),
-        'Project: %s' % project.get_name(),
-        'Sensor %s -- water level: %s cm' % (sensor.get_name(), water_level_median)     
+        'Project: %s -- report reference from MSL.' % project.get_name(),
+        'Sensor %s -- water level: %s m.' % (sensor.get_name(), water_level_median)     
     ])
     
     

@@ -111,10 +111,13 @@ class Data(models.Model):
         
         if self.sensor.formula:
             x = self.utrasonic
-            return eval(self.sensor.formula)
+            water_level = eval(self.sensor.formula)
             
         else:
-            return self.utrasonic
+            water_level = self.utrasonic
+            
+        # Convert to m.
+        return round(water_level/100, 2)
             
     def get_category(self):
         
@@ -164,7 +167,7 @@ class SMSLog(models.Model):
     message  = models.TextField()
     created  = models.DateTimeField()
     
-    message_sid = models.CharField(null=True, max_length=255) # stroe recived message sisd from service
+    message_sid = models.TextField(null=True, blank=True) # stroe recived message sisd from service
     
     def get_local_created(self):
         return self.created + timedelta(hours=self.project.timezone)

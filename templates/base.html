@@ -28,11 +28,25 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
+
+          {% if project_selected  %}
+          <a class="navbar-brand" href="{% url 'project_overview' project_selected.code.lower %}">TELEMETRY STATION</a>
+          {% else %}
           <a class="navbar-brand" href="{% url 'home' %}">TELEMETRY STATION</a>
+          {% endif %}
+          
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="{% url 'home' %}">Home</a></li>
+            <li class="active">
+              
+              {% if project_selected  %}
+              <a href="{% url 'project_overview' project_selected.code.lower %}">Home</a>
+              {% else %}
+              <a href="{% url 'home' %}">Home</a>
+              {% endif %}
+              
+            </li>
             <li><a href="#about">About</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
@@ -47,7 +61,7 @@
               
               <ul class="dropdown-menu select-project">
 
-                <li><a href="{% url 'home' %}">All projects</a></li>                
+                <li><a href="{% url 'home' %}all/">All projects</a></li>                
                 <li class="divider"></li>
                 <li class="dropdown-header">Select Project</li>
                                 
@@ -59,6 +73,8 @@
               
               </ul>
             </li>
+            
+            <!--
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">SI Units <b class="caret"></b></a>
               <ul class="dropdown-menu select-unit">
@@ -67,6 +83,7 @@
                 <li><a href="#">Imperial Units</a></li>
               </ul>
             </li>
+            -->
           </ul>
         </div><!--/.nav-collapse -->
       </div>

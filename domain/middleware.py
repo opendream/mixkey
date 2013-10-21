@@ -1,19 +1,55 @@
+from django.shortcuts import redirect
+
 from domain.models import Project
 
 class ProjectMiddleware(object):
+    
+    project_code = ''
+    project_selected = None
+    
     def process_view(self, request, view_func, view_args, view_kwargs):
         
-        project_code = view_kwargs.get('project_code')
+        project_code = view_kwargs.get('project_code') or ''
+        self.project_code = project_code
         
-        project_selected = False
+        if self.project_code.lower() == 'all':
+            self.project_selected = None
+            return
+        
         try:
             if project_code:
-                project_selected = Project.objects.get(code__iexact=project_code.lower())
-        except IndexError:
-            pass
+                self.project_selected = Project.objects.get(code__iexact=project_code.lower())
         except Project.DoesNotExist:
             pass
         
-        request.META['PROJECT_SELECTED'] = project_selected
-            
+        if not self.project_selected:
+            project_code = request.COOKIES.get('project_selected')
+            try:
+                if project_code:
+                    self.project_selected = Project.objects.get(code__iexact=project_code.lower())
+                    
+            except Project.DoesNotExist:
+                pass
+        
+        request.META['PROJECT_SELECTED'] = self.project_selected
+        
+        
+        # Redirect to project selected page
+        if self.project_code.lower() == 'all':
+            request.META['PROJECT_SELECTED'] = None
+        elif not self.project_code and self.project_selected:
+            return redirect('project_overview', project_code=self.project_selected.code.lower())
+                
+        
         return None
+        
+    def process_response(self, request, response):
+        
+        if self.project_code.lower() == 'all':
+            response = redirect('home')
+            response.delete_cookie('project_selected')
+            
+        elif self.project_selected:
+            response.set_cookie('project_selected', self.project_selected.code.lower())            
+
+        return response

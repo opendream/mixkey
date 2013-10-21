@@ -16,7 +16,7 @@ def project_overview(request, project_code=False):
         return data_create(request)
         
         
-    project_selected = request.META['PROJECT_SELECTED']
+    project_selected = request.META.get('PROJECT_SELECTED')
     
     if project_selected:
         project_query = [project_selected]
@@ -57,6 +57,9 @@ def project_overview(request, project_code=False):
         'data_list': data_list, 
         'project_list': project_list, 
     })
+
+def sensor_overview(request, project_code, sensor_code):
+    pass
     
 def data_create(request):
     

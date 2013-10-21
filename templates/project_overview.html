@@ -28,8 +28,8 @@
       </div>
       <div class="panel-body">
         <div class="data-field data-primary-field">
-          <h4 class="data-primary-field-label">Water Level</h4>
-          <div class="data-primary-field-value">{{ data.get_water_level }} cm.</div>          
+          <h4 class="data-primary-field-label">Water Level MSL</h4>
+          <div class="data-primary-field-value">{{ data.get_water_level }} m.</div>          
         </div>
         <div class="data-field data-other-field">
           <table class="table table-striped">
@@ -77,11 +77,12 @@
         <th>Project</th>
         {% endif %}
         <th>Sensor</th>
-        <th>Water Level (cm.)</th>
+        <th>Water Level MSL (m.)</th>
         <th>Temperature (&#8451;)</th>
         <th>Humidity (%)</th>
         <th>Raingauge (mm.)</th>
         <th>Date Time</th>
+        <th>Code</th>
       </tr>
     </thead>
     <tbody>
@@ -97,6 +98,11 @@
         <td>{{ data.humidity }}</td>
         <td>{{ data.raingauge }}</td>
         <td>{{ data.get_local_created|date:"Y-m-d H:i:s" }}</td>
+        <th>
+          <div class="label label-{{ data.get_category|category_to_class }}">
+            {{ data.get_category}}
+          </div>
+        </th>
       </tr>
       {% endfor %}
     

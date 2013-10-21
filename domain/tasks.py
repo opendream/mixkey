@@ -20,7 +20,13 @@ def send_sms(project, message_body, category, sensor=None, created=None):
         
         client = TwilioRestClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
         
-        for tel in project.tel_list.split(','):
+        tel_list = []
+        if sensor:
+            tel_list = sensor.tel_list.split(',')
+        else:
+            tel_list = project.tel_list.split(','):
+            
+        for tel in tel_list:
             
             tel = tel.strip()
             message = client.messages.create(body=message_body, to=tel, from_=settings.TWILIO_FROM_NUMBER)

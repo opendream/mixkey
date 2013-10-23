@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db.models import Q
 
-from domain.models import Project, Data, SMSLog
+from domain.models import Project, Sensor, Data, SMSLog
 from domain.templatetags.domain_tags import cm2m
 
 from celery.decorators import task
@@ -16,29 +16,35 @@ def send_sms(project, message_body, category, sensor=None, created=None):
     # Send message to tel list with Twilio
     message = None
     message_sid = []
-    if settings.TWILIO_SEND_SMS:
         
-        client = TwilioRestClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+    client = TwilioRestClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+    
+    tel_list = []
+    if sensor:
+        if category in [SMSLog.ALERT_RED, SMSLog.ALERT_YELLOW, SMSLog.ALERT_GREEN]:
+            tel_list = sensor.tel_list or ''
+        elif category in [SMSLog.SENSOR_LOST]:
+            tel_list = settings.DETECT_SENSOR_LOST_TEL_LIST or ''
+            
+    else:
+        tel_list = project.tel_list or ''
         
-        tel_list = []
-        if sensor:
-            tel_list = sensor.tel_list.split(',')
-        else:
-            tel_list = project.tel_list.split(',')
-            
-        for tel in tel_list:
-            
-            tel = tel.strip()
+    for tel in tel_list.split(','):
+        
+        tel = tel.strip()
+        
+        if settings.TWILIO_SEND_SMS:
+        
             message = client.messages.create(body=message_body, to=tel, from_=settings.TWILIO_FROM_NUMBER)
             message_sid.append(message.sid)
-        
+    
         message_sid = ','.join(message_sid)
         
         
     if not created:
         created = datetime.today()
                     
-    SMSLog.objects.create(project=project, sensor=sensor, category=category, is_send=settings.TWILIO_SEND_SMS, from_tel=settings.TWILIO_FROM_NUMBER, to_tel=project.tel_list, message=message_body, message_sid=message_sid, created=created)
+    SMSLog.objects.create(project=project, sensor=sensor, category=category, is_send=settings.TWILIO_SEND_SMS, from_tel=settings.TWILIO_FROM_NUMBER, to_tel=', '.join(tel_list), message=message_body, message_sid=message_sid, created=created)
     
     return message
     
@@ -147,9 +153,24 @@ def send_alert(data):
         
         except IndexError:
             pass
+            
+@task()            
+def detect_sensor_lost():
     
-
-
+    for sensor in Sensor.objects.exclude(data=None):
+        
+        today = datetime.today()
+        latest_data = sensor.data_set.latest('created')
+     
+        if (latest_data.created <= today - timedelta(minutes=settings.DETECT_SENSOR_LOST_TIME)) and (latest_data.created > today - timedelta(minutes=settings.DETECT_SENSOR_LOST_TIME*2)):
+            messages = [
+                'Detect sensor lost signal more than %s minutes.' % settings.DETECT_SENSOR_LOST_TIME,
+                'Project %s -- Sensor %s.' % (sensor.project.get_name(), sensor.get_name())
+            ]
+            message_body = '\n'.join(messages)        
+            
+            send_sms(sensor.project, message_body, SMSLog.SENSOR_LOST, sensor=sensor, created=today)
+                            
 
 
 

@@ -201,6 +201,8 @@ TWILIO_FROM_NUMBER = 'REPLACE ME'
 PREV_DATA_BUFFER_TIME = 10 # miniutes
 MAX_REPEAT_ALERT = 5
 
+DETECT_SENSOR_LOST_TIME = 30 # miniutes
+DETECT_SENSOR_LOST_TEL_LIST = '+66897070170,+66897753337,+66842226566'
 
 # DEBUG MODE ##################################################################
 if DEBUG:

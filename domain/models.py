@@ -184,11 +184,14 @@ class SMSLog(models.Model):
     ALERT_YELLOW = 2
     ALERT_GREEN  = 3
     DAILY        = 4
+    SENSOR_LOST  = 5
+    
     CATEGORY_CHOICES = (
         (ALERT_RED, 'RED'), 
         (ALERT_YELLOW, 'YELLOW'), 
         (ALERT_GREEN, 'GREEN'), 
-        (DAILY, 'DAILY')
+        (DAILY, 'DAILY'),
+        (SENSOR_LOST, 'SENSOR LOST')
     )
     
     project      = models.ForeignKey(Project) # Required

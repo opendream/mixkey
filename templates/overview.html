@@ -125,7 +125,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
       <div class="panel-body">
         <div class="data-field data-primary-field">
           <h4 class="data-primary-field-label">Water Level MSL</h4>
-          <div class="data-primary-field-value">{{ data.get_water_level|cm2m }} m.</div>          
+          <div class="data-primary-field-value">{{ data.get_water_level }} cm.</div>          
         </div>
         <div class="data-field data-other-field">
           <table class="table table-striped">
@@ -177,7 +177,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
         {% if not sensor_selected %}
         <th>Sensor</th>
         {% endif %}
-        <th>Water Level MSL (m.)</th>
+        <th>Water Level MSL (cm.)</th>
         <th>Temperature (&#8451;)</th>
         <th>Humidity (%)</th>
         <th>Raingauge (mm.)</th>
@@ -195,7 +195,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
         {% if not sensor_selected %}
         <td><a href="{% url 'sensor_overview' data.sensor.project.code.lower data.sensor.code.lower %}">{{ data.sensor.get_name }}</a></td>
         {% endif %}
-        <td>{{ data.get_water_level|cm2m }}</td>
+        <td>{{ data.get_water_level }}</td>
         <td>{{ data.temperature }}</td>
         <td>{{ data.humidity }}</td>
         <td>{{ data.raingauge }}</td>

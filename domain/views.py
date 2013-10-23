@@ -36,6 +36,7 @@ def project_overview(request, project_code=False, sensor_code=False):
         try:
             if sensor_code:
                 sensor_selected = Sensor.objects.get(project=project_selected, code=sensor_code)
+                data_list = data_list.filter(sensor=sensor_selected)
         except Sensor.DoesNotExist:
             pass
         

@@ -70,7 +70,7 @@ def send_daily():
             water_level_list = [data.get_water_level() for data in data_list]
             
             if water_level_list:
-                messages.append('Sensor %s -- max: %s cm., min: %s cm., average: %s cm.' % (sensor.get_name(), (max(water_level_list)), (min(water_level_list)), (float(sum(water_level_list))/len(water_level_list))))
+                messages.append('Sensor %s -- max: %s cm., min: %s cm., average: %s cm.' % (sensor.get_name(), (max(water_level_list)), (min(water_level_list)), round(float(sum(water_level_list))/len(water_level_list), 2)))
             else:
                 messages.append('Sensor %s -- no data recorded, something problems, please check the sensor.' % (sensor.get_name()))
                 

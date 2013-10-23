@@ -51,7 +51,7 @@ class ProjectMiddleware(object):
         
         
         if self.project_code.lower() == 'all':
-            response = redirect('home')
+            #response = redirect('home')
             response.set_cookie('project_selected', 'all')
             
         elif self.project_selected:

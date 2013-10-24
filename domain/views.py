@@ -126,13 +126,13 @@ def data_summary(sensor, data_list, method='days'):
             summary_value = []
             summary_dt = []
     
-    if type(summary_value) == list:
-        summary_value = np.mean(medfilt1(summary_value, 8))
-        summary_value_list.append(summary_value)
-        
-    if type(summary_dt) == list:
-        summary_dt = (summary_dt[int(len(summary_dt)/2)] - timedelta(days=method_map[method])).strftime("%Y-%m-%d")
-        summary_dt_list.append(summary_dt)
+    #if type(summary_value) == list:
+    #    summary_value = np.mean(medfilt1(summary_value, 8))
+    #    summary_value_list.append(summary_value)
+    #    
+    #if type(summary_dt) == list:
+    #    summary_dt = (summary_dt[int(len(summary_dt)/2)] - timedelta(days=method_map[method])).strftime("%Y-%m-%d")
+    #    summary_dt_list.append(summary_dt)
     
     
     summary_value_list.append('Water Level')

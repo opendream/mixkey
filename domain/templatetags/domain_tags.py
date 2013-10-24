@@ -1,4 +1,6 @@
-
+from django.core.serializers import serialize
+from django.db.models.query import QuerySet
+from django.utils import simplejson
 from django import template
 
 register = template.Library()
@@ -21,3 +23,11 @@ def category_to_class(category):
 @register.filter(name='cm2m')        
 def cm2m(value):
     return round(value/100, 2)
+    
+@register.filter(name='jsonify', is_safe=True)
+def jsonify(object):
+    if isinstance(object, QuerySet):
+        return serialize('json', object)
+    return simplejson.dumps(object)
+
+register.filter('jsonify', jsonify)

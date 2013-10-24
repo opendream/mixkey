@@ -67,3 +67,7 @@ h1 {
 ul.select-unit {
     width: 180px;
 }
+
+.box-underline {
+    border-bottom: 1px solid #ddd;
+}

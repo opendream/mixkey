@@ -3,6 +3,64 @@
 {% load domain_tags %}
 
 {% block js %}
+
+{% if project_selected %}
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+  google.load('visualization', '1', {packages: ['corechart']});
+</script>
+<script type="text/javascript">
+
+
+function drawVisualization(elm, data, title) {
+  // Some raw data (not necessarily accurate)
+  /*
+  var data = google.visualization.arrayToDataTable([
+    ['Month', 'Bolivia', 'Ecuador', 'Madagascar', 'Papua New Guinea', 'Rwanda', 'Average'],
+    ['2004/05',  165,      938,         522,             998,           450,      614.6],
+    ['2005/06',  135,      1120,        599,             1268,          288,      682],
+    ['2006/07',  157,      1167,        587,             807,           397,      623],
+    ['2007/08',  139,      1110,        615,             968,           215,      609.4],
+    ['2008/09',  136,      691,         629,             1026,          366,      569.6]
+  ]);
+  */
+  var data = google.visualization.arrayToDataTable(data);
+
+  var options = {
+    title : title,
+    vAxis: {title: "Water Level (cm.)"},
+    hAxis: {title: "Date"},
+    seriesType: "line"
+    //series: {5: {type: "line"}}
+  };
+
+  var chart = new google.visualization.ComboChart(document.getElementById(elm));
+  chart.draw(data, options);
+}
+
+
+var data_summary_list = [];
+
+{% for project, sensor_list in project_list %}
+{% for sensor, data in sensor_list  %}
+    
+data_summary = {{ sensor.data_summary|jsonify|safe }};
+data_summary_list.push(data_summary);
+
+google.setOnLoadCallback(function () {
+  drawVisualization('sensor-chart-{{ sensor.id }}', data_summary, '{{ sensor.get_name }}')
+});
+
+{% endfor %}
+{% endfor %}
+
+
+
+
+</script>
+{% endif %}
+
+
 {% if sensor_selected %}
 
 <style>
@@ -156,6 +214,26 @@ google.maps.event.addDomListener(window, 'load', initialize);
           
   {% endfor %}
 {% endfor %}
+
+
+<div class="realtime-pannel panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading"><h4>Graph</h4></div>
+  <div class="panel-body box-underline">
+    <p>This graph process by water level average of days or weeks or months.</p>
+  </div>
+  
+  {% for project, sensor_list in project_list %}
+  {% for sensor, data in sensor_list  %}
+    
+  <div id="sensor-chart-{{ sensor.id}}" style="height: 500px;">
+    GRAPH HERE
+  </div>
+
+  {% endfor %}
+  {% endfor %}
+</div>
+
 
 
 <div class="realtime-pannel panel panel-default">

@@ -3,11 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound
 
 from domain.models import Project, Sensor, Data
-from domain.functions import medfilt1
-
-from datetime import datetime, timedelta
-
-import numpy as np
+from datetime import datetime
 
 def home(request):
     # For mixkey create record
@@ -62,12 +58,8 @@ def project_overview(request, project_code=False, sensor_code=False):
         for sensor in sensor_query:
                         
             data = False
-            sensor_data_list = sensor.data_set.order_by('-created')
-            
-            sensor.data_summary = data_summary(sensor, sensor_data_list, method='days')
-            
             try:
-                data = sensor_data_list[0]
+                data = sensor.data_set.order_by('-created')[0]
             except IndexError:
                 pass
             
@@ -83,80 +75,6 @@ def project_overview(request, project_code=False, sensor_code=False):
         'sensor_selected': sensor_selected
     })
 
-def data_summary(sensor, data_list, method='days'):
-    
-    
-    method_map = {
-        'years': 365,
-        'months': 30,
-        'weeks': 7,
-        'days': 1,
-    }
-    
-    current_dt = datetime.today()
-    # duration per value
-    dpv = timedelta(days=method_map[method])
-    
-    data_list = list(data_list.filter(created__lte=current_dt))
-    
-    summary_value_list = []
-    summary_value = []
-    
-    summary_dt_list = []
-    summary_dt = []
-    
-    end = len(data_list)
-    
-    for data in data_list:
-        
-
-        
-        if current_dt - dpv < data.created <= current_dt:
-            summary_value.append(data.get_water_level_raw())
-            summary_dt.append(data.created)
-        
-        if data.created <= current_dt - dpv:
-            current_dt = current_dt - dpv
-            summary_value = np.mean(medfilt1(summary_value, 8))
-            summary_value_list.append(summary_value)
-            
-            summary_dt = summary_dt[int(len(summary_dt)/2)].strftime("%Y-%m-%d")
-            summary_dt_list.append(summary_dt)
-            
-            summary_value = []
-            summary_dt = []
-    
-    if type(summary_value) == list:
-        summary_value = np.mean(medfilt1(summary_value, 8))
-        summary_value_list.append(summary_value)
-        
-    if type(summary_dt) == list:
-        summary_dt = (summary_dt[int(len(summary_dt)/2)] - timedelta(days=method_map[method])).strftime("%Y-%m-%d")
-        summary_dt_list.append(summary_dt)
-    
-    
-    summary_value_list.append('Water Level')
-    summary_dt_list.append('Date')
-    
-    summary_value_list.reverse()
-    summary_dt_list.reverse()
-    
-    summary_list = [summary_dt_list, summary_value_list]
-    
-    length = len(summary_dt_list)
-    
-    if sensor.level_red:
-        level_red_list = ['Red Level']
-        level_red_list.extend([sensor.level_red]*length)
-        summary_list.append(level_red_list)
-        
-    if sensor.level_yellow:
-        level_yellow_list = ['Yellow Level']
-        level_yellow_list.extend([sensor.level_yellow]*length)
-        summary_list.append(level_yellow_list)
-        
-    return zip(*summary_list)
-    
     
 def data_create(request):
     

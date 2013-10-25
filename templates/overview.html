@@ -24,7 +24,7 @@ function drawVisualization(elm, data, title) {
     ['2008/09',  136,      691,         629,             1026,          366,      569.6]
   ]);
   */
-  var data = google.visualization.arrayToDataTable(data);
+  data = google.visualization.arrayToDataTable(data);
 
   var options = {
     title : title,
@@ -39,22 +39,24 @@ function drawVisualization(elm, data, title) {
 }
 
 
-var data_summary_list = [];
+var data_summary_list = {};
+var data_summary_title_list = {};
 
 {% for project, sensor_list in project_list %}
 {% for sensor, data in sensor_list  %}
     
-data_summary = {{ sensor.data_summary|jsonify|safe }};
-data_summary_list.push(data_summary);
+data_summary_list[{{ sensor.id }}] = {{ sensor.data_summary|jsonify|safe }};
+data_summary_title_list[{{ sensor.id }}]  = '{{ sensor.get_name }}';
+
+
+{% endfor %}
+{% endfor %}
 
 google.setOnLoadCallback(function () {
-  drawVisualization('sensor-chart-{{ sensor.id }}', data_summary, '{{ sensor.get_name }}')
+  $.each(data_summary_list, function (key, data) {
+    drawVisualization('sensor-chart-' + key, data, data_summary_title_list[key]);
+  })
 });
-
-{% endfor %}
-{% endfor %}
-
-
 
 
 </script>

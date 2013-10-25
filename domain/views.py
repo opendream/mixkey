@@ -63,7 +63,7 @@ def project_overview(request, project_code=False, sensor_code=False):
                         
             data = False
             sensor_data_list = sensor.data_set.order_by('-created')
-            
+                        
             sensor.data_summary = data_summary(sensor, sensor_data_list, method='days')
             
             try:

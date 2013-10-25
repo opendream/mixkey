@@ -221,19 +221,20 @@ google.maps.event.addDomListener(window, 'load', initialize);
 <div class="realtime-pannel panel panel-default">
   <!-- Default panel contents -->
   <div class="panel-heading"><h4>Graph</h4></div>
-  <div class="panel-body box-underline">
-    <p>This graph process by water level average of days or weeks or months.</p>
+  <div class="panel-body box-underline">This graph process by water level average of days or weeks or months.</div>
+  <div class="panel-body">
+  
+    {% for project, sensor_list in project_list %}
+    {% for sensor, data in sensor_list  %}
+    
+    <div id="sensor-chart-{{ sensor.id}}" style="height: 500px;">
+      GRAPH HERE
+    </div>
+
+    {% endfor %}
+    {% endfor %}
   </div>
   
-  {% for project, sensor_list in project_list %}
-  {% for sensor, data in sensor_list  %}
-    
-  <div id="sensor-chart-{{ sensor.id}}" style="height: 500px;">
-    GRAPH HERE
-  </div>
-
-  {% endfor %}
-  {% endfor %}
 </div>
 {% endif %}
 

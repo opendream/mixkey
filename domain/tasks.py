@@ -38,7 +38,7 @@ def send_sms(project, message_body, category, sensor=None, created=None):
             message = client.messages.create(body=message_body, to=tel, from_=settings.TWILIO_FROM_NUMBER)
             message_sid.append(message.sid)
     
-        message_sid = ','.join(message_sid)
+    message_sid = ','.join(message_sid)
         
         
     if not created:

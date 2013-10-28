@@ -19,7 +19,7 @@ def send_sms(project, message_body, category, sensor=None, created=None):
         
     client = TwilioRestClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
     
-    tel_list = []
+    tel_list = ''
     if sensor:
         if category in [SMSLog.ALERT_RED, SMSLog.ALERT_YELLOW, SMSLog.ALERT_GREEN]:
             tel_list = sensor.tel_list or ''
@@ -44,7 +44,7 @@ def send_sms(project, message_body, category, sensor=None, created=None):
     if not created:
         created = datetime.today()
                     
-    SMSLog.objects.create(project=project, sensor=sensor, category=category, is_send=settings.TWILIO_SEND_SMS, from_tel=settings.TWILIO_FROM_NUMBER, to_tel=', '.join(tel_list), message=message_body, message_sid=message_sid, created=created)
+    SMSLog.objects.create(project=project, sensor=sensor, category=category, is_send=settings.TWILIO_SEND_SMS, from_tel=settings.TWILIO_FROM_NUMBER, to_tel=tel_list, message=message_body, message_sid=message_sid, created=created)
     
     return message
     

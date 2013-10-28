@@ -195,6 +195,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
                 <th>Temperature (&#8451;)</th>
                 <th>Humidity (%)</th>
                 <th>Raingauge (mm.)</th>
+                <th>Battery (%)</th>
                 <th>Date Time</th>
               </tr>
             </thead>
@@ -204,6 +205,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
                 <td>{{ data.temperature }}</td>
                 <td>{{ data.humidity }}</td>
                 <td>{{ data.raingauge }}</td>
+                <td>{{ data.battery }}</td>
                 <td>{{ data.get_local_created|date:"Y-m-d H:i:s" }}</td>
               </tr>
             </tbody>

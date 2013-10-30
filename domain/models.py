@@ -105,7 +105,7 @@ class Sensor(models.Model):
         
         try:
             data = Data.objects.order_by('-created')[0]
-            water_level = data.get_water_level()
+            water_level = data.get_water_level
         except Data.DoesNotExist:
             pass
         
@@ -119,10 +119,10 @@ class Sensor(models.Model):
     def __unicode__(self):
         return self.get_name()
 
-class Data(models.Model):
+class BaseData(models.Model):
     
     sensor      = models.ForeignKey(Sensor)
-    utrasonic   = models.IntegerField()          # Required
+    utrasonic   = models.IntegerField(null=True, blank=True)
     temperature = models.FloatField(null=True, blank=True)
     humidity    = models.IntegerField(null=True, blank=True)
     raingauge   = models.FloatField(null=True, blank=True)
@@ -130,6 +130,10 @@ class Data(models.Model):
     
     created     = models.DateTimeField()
     
+    class Meta:
+        abstract = True
+    
+    @property
     def get_water_level_raw(self):
         
         if self.sensor.formula:
@@ -141,14 +145,14 @@ class Data(models.Model):
         
         return water_level
         
-        
+    @property    
     def get_water_level(self):
                 
         # List of the data previous in 10 miniutes
         time_prev_check = self.created-timedelta(minutes=settings.PREV_DATA_BUFFER_TIME)
     
         data_list = self.sensor.data_set.filter(created__gte=time_prev_check, created__lte=self.created).order_by('-created')
-        water_level_list = [d.get_water_level_raw() for d in data_list]
+        water_level_list = [d.get_water_level_raw for d in data_list]
         return median(water_level_list)
     
 
@@ -156,7 +160,7 @@ class Data(models.Model):
     def get_category(self):
         
         sensor = self.sensor
-        water_level = self.get_water_level()
+        water_level = self.get_water_level
         
         if water_level >= sensor.level_red:
             return 'RED'
@@ -172,7 +176,7 @@ class Data(models.Model):
         return 'Sensor: %s at %s' % (self.sensor.get_name(), self.get_local_created().strftime("%Y-%m-%d %H:%M:%S"))
         
     def save(self, *args, **kwargs):
-        super(Data, self).save(*args, **kwargs)
+        super(BaseData, self).save(*args, **kwargs)
         from domain.tasks import send_alert
         #send_alert.delay(self.id)
         send_alert(self.id)
@@ -212,3 +216,14 @@ class SMSLog(models.Model):
     def __unicode__(self):
         return '[%s] %s at %s' % (self.get_category_display(), self.project.get_name(), self.get_local_created().strftime("%Y-%m-%d %H:%M:%S"))
     
+class Data(BaseData):
+    pass
+# Cache data table
+class DataDay(BaseData):
+    pass
+class DataWeek(BaseData):
+    pass
+class DataMonth(BaseData):
+    pass
+class DataYear(BaseData):
+    pass

@@ -77,7 +77,7 @@ def send_daily():
         for sensor in project.sensor_set.all():
             
             data_list = sensor.data_set.filter(created__gt=yesterday, created__lte=yesterday_midnight)
-            water_level_list = [data.get_water_level() for data in data_list]
+            water_level_list = [data.get_water_level for data in data_list]
             
             if water_level_list:
                 messages.append('Sensor %s -- max: %s cm., min: %s cm., average: %s cm.' % (sensor.get_name(), (max(water_level_list)), (min(water_level_list)), round(float(sum(water_level_list))/len(water_level_list), 2)))
@@ -129,7 +129,7 @@ def send_alert(data):
             
     
     project = data.sensor.project
-    water_level_median = data.get_water_level()
+    water_level_median = data.get_water_level
     
     #water_level_median = median(water_level_list)
   

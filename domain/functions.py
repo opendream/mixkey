@@ -1,3 +1,4 @@
+import datetime
 import numpy as np
 
 def median(mylist):
@@ -78,3 +79,8 @@ def medfilt1(x=None,L=None):
             xout[i] = np.median(xin[i-Lwing:i+Lwing+1]) # (i-Lwing to i+Lwing)
 
     return xout.tolist()
+
+
+def set_to_midnight(dt):
+    midnight = datetime.time(0)
+    return datetime.datetime.combine(dt.date(), midnight)

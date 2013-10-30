@@ -2,8 +2,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound
 
-from domain.models import Project, Sensor, Data
-from domain.functions import medfilt1
+from domain.models import Project, Sensor, Data, DataDay, DataWeek, DataMonth, DataYear
+from domain.functions import medfilt1, set_to_midnight
 
 from datetime import datetime, timedelta
 
@@ -64,7 +64,7 @@ def project_overview(request, project_code=False, sensor_code=False):
             data = False
             sensor_data_list = sensor.data_set.order_by('-created')
                         
-            sensor.data_summary = data_summary(sensor, sensor_data_list, method='days')
+            sensor.data_summary = data_summary(sensor, sensor_data_list, method='DataDay', field_name='utrasonic')
             
             try:
                 data = sensor_data_list[0]
@@ -83,22 +83,39 @@ def project_overview(request, project_code=False, sensor_code=False):
         'sensor_selected': sensor_selected
     })
 
-def data_summary(sensor, data_list, method='days'):
+def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
     
     
     method_map = {
-        'years': 365,
-        'months': 30,
-        'weeks': 7,
-        'days': 1,
+        'DataYear': 365,
+        'DataMonth': 30,
+        'DataWeek': 7,
+        'DataDay': 1,
     }
     
+    InstCache = eval(method)
+    
+    # prepare cache
+    cache_list = list(InstCache.objects.filter(sensor=sensor).order_by('-created'))
+    
+    # Performance case, cut rows of query only realtime not cache
+    cache_latest_created = None
+    try:
+        cache_latest_created = cache_list[0].created        
+        data_list = data_list.filter(created__gt=cache_latest_created)
+    except IndexError:
+        pass
+    
     current_dt = datetime.today()
+    current_dt = set_to_midnight(current_dt)
+    
     # duration per value
     dpv = timedelta(days=method_map[method])
     
+    # merge data from cache and realtime
     data_list = list(data_list.filter(created__lte=current_dt))
-    
+    print len(data_list)
+        
     summary_value_list = []
     summary_value = []
     
@@ -109,12 +126,12 @@ def data_summary(sensor, data_list, method='days'):
     
     for data in data_list:
         
-        water_level_raw = data.get_water_level_raw()
-        if not water_level_raw:
+        value = getattr(data, field_name)
+        if not value:
             continue
         
         if current_dt - dpv < data.created <= current_dt:
-            summary_value.append(water_level_raw)
+            summary_value.append(value)
             summary_dt.append(data.created)
         
         if data.created <= current_dt - dpv:
@@ -124,45 +141,70 @@ def data_summary(sensor, data_list, method='days'):
                 summary_value = None
             else:
                 summary_value = np.mean(medfilt1(summary_value, 8))
+
             summary_value_list.append(summary_value)
            
             if not summary_dt:
-                summary_dt = current_dt.strftime("%Y-%m-%d")
+                summary_dt = current_dt
             else: 
-                summary_dt = summary_dt[int(len(summary_dt)/2)].strftime("%Y-%m-%d")
-            summary_dt_list.append(summary_dt)
+                summary_dt = summary_dt[int(len(summary_dt)/2)]
+                
+            summary_dt = set_to_midnight(summary_dt)
+            
+            # create cache if not exist
+            if not cache_latest_created or summary_dt > cache_latest_created:
+                try:
+                    cache = InstCache.objects.get(sensor=sensor, created=summary_dt)
+                except InstCache.DoesNotExist:
+                    cache = InstCache.objects.create(sensor=sensor, created=summary_dt)
+            
+                if getattr(cache, field_name) == None:
+                    setattr(cache, field_name, summary_value)
+                    cache.save()
+            
+            summary_dt_list.append(summary_dt.strftime("%Y-%m-%d"))
+            
+            
             
             summary_value = []
             summary_dt = []
     
-    #if type(summary_value) == list:
-    #    summary_value = np.mean(medfilt1(summary_value, 8))
-    #    summary_value_list.append(summary_value)
-    #    
-    #if type(summary_dt) == list:
-    #    summary_dt = (summary_dt[int(len(summary_dt)/2)] - timedelta(days=method_map[method])).strftime("%Y-%m-%d")
-    #    summary_dt_list.append(summary_dt)
+    label = field_name
     
+    # merge cache and realtime data 
+    summary_value_list.extend([getattr(cache, field_name) for cache in cache_list])
+    summary_dt_list.extend([cache.created.strftime("%Y-%m-%d") for cache in cache_list])
     
-    summary_value_list.append('Water Level')
+    # calculate to water level
+    if field_name == 'utrasonic' and sensor.formula:
+        summary_value_list = [eval(sensor.formula) if x != None else x for x in summary_value_list]
+        label = 'Water Level'
+    
+    #add label to graph    
+    summary_value_list.append(label)
     summary_dt_list.append('Date')
     
+    # flip graph left to right
     summary_value_list.reverse()
     summary_dt_list.reverse()
     
+    #prepare data for google api chart
     summary_list = [summary_dt_list, summary_value_list]
     
-    length = len(summary_dt_list)
-    
-    if sensor.level_red:
-        level_red_list = ['Red Level']
-        level_red_list.extend([sensor.level_red]*length)
-        summary_list.append(level_red_list)
+    # add red yellow line
+    if field_name == 'utrasonic':
         
-    if sensor.level_yellow:
-        level_yellow_list = ['Yellow Level']
-        level_yellow_list.extend([sensor.level_yellow]*length)
-        summary_list.append(level_yellow_list)
+        length = len(summary_dt_list)
+        
+        if sensor.level_red:
+            level_red_list = ['Red Level']
+            level_red_list.extend([sensor.level_red]*length)
+            summary_list.append(level_red_list)
+        
+        if sensor.level_yellow:
+            level_yellow_list = ['Yellow Level']
+            level_yellow_list.extend([sensor.level_yellow]*length)
+            summary_list.append(level_yellow_list)
         
     return zip(*summary_list)
     

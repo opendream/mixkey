@@ -16,6 +16,7 @@ def send_sms(project, message_body, category, sensor=None, created=None):
     # Send message to tel list with Twilio
     message = None
     message_sid = []
+    tel_list_log = []
         
     client = TwilioRestClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
     
@@ -29,6 +30,7 @@ def send_sms(project, message_body, category, sensor=None, created=None):
     else:
         tel_list = project.tel_list or ''
         
+
     for tel in tel_list.split(','):
         
         tel = tel.strip()
@@ -37,14 +39,16 @@ def send_sms(project, message_body, category, sensor=None, created=None):
         
             message = client.messages.create(body=message_body, to=tel, from_=settings.TWILIO_FROM_NUMBER)
             message_sid.append(message.sid)
+            tel_list_log.append(tel)
     
     message_sid = ','.join(message_sid)
+    tel_list_log = ','.join(tel_list_log)
         
         
     if not created:
         created = datetime.today()
                     
-    SMSLog.objects.create(project=project, sensor=sensor, category=category, is_send=settings.TWILIO_SEND_SMS, from_tel=settings.TWILIO_FROM_NUMBER, to_tel=tel_list, message=message_body, message_sid=message_sid, created=created)
+    SMSLog.objects.create(project=project, sensor=sensor, category=category, is_send=settings.TWILIO_SEND_SMS, from_tel=settings.TWILIO_FROM_NUMBER, to_tel=tel_list_log, message=message_body, message_sid=message_sid, created=created)
     
     return message
     

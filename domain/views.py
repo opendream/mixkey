@@ -109,18 +109,27 @@ def data_summary(sensor, data_list, method='days'):
     
     for data in data_list:
         
-
+        water_level_raw = data.get_water_level_raw()
+        if not water_level_raw:
+            continue
         
         if current_dt - dpv < data.created <= current_dt:
-            summary_value.append(data.get_water_level_raw())
+            summary_value.append(water_level_raw)
             summary_dt.append(data.created)
         
         if data.created <= current_dt - dpv:
+
             current_dt = current_dt - dpv
-            summary_value = np.mean(medfilt1(summary_value, 8))
+            if not summary_value:
+                summary_value = None
+            else:
+                summary_value = np.mean(medfilt1(summary_value, 8))
             summary_value_list.append(summary_value)
-            
-            summary_dt = summary_dt[int(len(summary_dt)/2)].strftime("%Y-%m-%d")
+           
+            if not summary_dt:
+                summary_dt = current_dt.strftime("%Y-%m-%d")
+            else: 
+                summary_dt = summary_dt[int(len(summary_dt)/2)].strftime("%Y-%m-%d")
             summary_dt_list.append(summary_dt)
             
             summary_value = []

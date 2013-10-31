@@ -24,11 +24,12 @@ function drawVisualization(elm, data, title) {
     ['2008/09',  136,      691,         629,             1026,          366,      569.6]
   ]);
   */
+  var label = data[0][1];
   data = google.visualization.arrayToDataTable(data);
-
+  
   var options = {
     title : title,
-    vAxis: {title: "Water Level (cm.)", minValue: null},
+    vAxis: {title: label, minValue: null},
     hAxis: {title: "Date"},
     seriesType: "line",
     series: {0: {type: "area"}}
@@ -58,6 +59,14 @@ google.setOnLoadCallback(function () {
   })
 });
 
+
+jQuery(document).ready(function () {
+  jQuery('#graph-select a').click(function () {
+    jQuery('#graph-render-list').html('');
+    jQuery('#loading-img').css('display', 'block').appendTo('#graph-render-list');
+    window.location = jQuery(this).attr('href');
+  });
+});
 
 </script>
 {% endif %}
@@ -133,9 +142,11 @@ function initialize() {
     window.open('http://maps.google.com/?q=loc:' + ll + '&z=' + z);
   });
   
+
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
+
 
 </script>
 {% endif %}
@@ -195,7 +206,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
                 <th>Temperature (&#8451;)</th>
                 <th>Humidity (%)</th>
                 <th>Raingauge (mm.)</th>
-                <th>Battery (%)</th>
+                <th>Battery (V)</th>
                 <th>Date Time</th>
               </tr>
             </thead>
@@ -220,11 +231,18 @@ google.maps.event.addDomListener(window, 'load', initialize);
 {% endfor %}
 
 {% if project_selected %}
-<div class="realtime-pannel panel panel-default">
+
+<div class="panel panel-default" id="graph">
   <!-- Default panel contents -->
   <div class="panel-heading"><h4>Graph</h4></div>
-  <div class="panel-body box-underline">This graph process by water level average of days or weeks or months.</div>
   <div class="panel-body">
+    <ul class="nav nav-tabs" id="graph-select">
+      {% for field_name in field_name_list %}
+      <li{% if current_field == field_name %} class="active"{% endif %}><a href="?field={{ field_name }}#graph" data-toggle="tab">{{ field_name|title }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="panel-body" id="graph-render-list">
   
     {% for project, sensor_list in project_list %}
     {% for sensor, data in sensor_list  %}
@@ -297,4 +315,5 @@ google.maps.event.addDomListener(window, 'load', initialize);
 
 </div>
 
+<img id="loading-img" src="{{ STATIC_URL }}css/img/loading.gif" width="500" height="500" style="display:none; margin: 0 auto; max-width: 100%; height: auto;"/>
 {% endblock %}

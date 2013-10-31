@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Create your views here.
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound
@@ -8,6 +10,15 @@ from domain.functions import medfilt1, set_to_midnight
 from datetime import datetime, timedelta
 
 import numpy as np
+
+field_name_list = ['utrasonic', 'temperature', 'humidity', 'raingauge', 'battery']
+field_label_list ={
+    'utrasonic'  : 'Water Level (cm.)', 
+    'temperature': 'Temperature (℃)', 
+    'humidity'   : 'Humidity (%)', 
+    'raingauge'  : 'Raingauge (mm.)', 
+    'battery'    : 'Battery (V)'
+}
 
 def home(request):
     # For mixkey create record
@@ -50,6 +61,8 @@ def project_overview(request, project_code=False, sensor_code=False):
     # Summary
     project_list = []
     
+    field_name = request.GET.get('field') or 'utrasonic'
+    
     for project in project_query:
         
         sensor_list = []
@@ -64,7 +77,7 @@ def project_overview(request, project_code=False, sensor_code=False):
             data = False
             sensor_data_list = sensor.data_set.order_by('-created')
                         
-            sensor.data_summary = data_summary(sensor, sensor_data_list, method='DataDay', field_name='utrasonic')
+            sensor.data_summary = data_summary(sensor, sensor_data_list, method='DataDay', field_name=field_name)
             
             try:
                 data = sensor_data_list[0]
@@ -80,7 +93,9 @@ def project_overview(request, project_code=False, sensor_code=False):
     return render(request, 'overview.html', {
         'data_list': data_list, 
         'project_list': project_list,
-        'sensor_selected': sensor_selected
+        'sensor_selected': sensor_selected,
+        'field_name_list': field_name_list,
+        'current_field': field_name
     })
 
 def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
@@ -114,10 +129,12 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
     
     # merge data from cache and realtime
     data_list = list(data_list.filter(created__lte=current_dt))
-    print len(data_list)
         
     summary_value_list = []
     summary_value = []
+    
+    summary_value_all_list = []
+    summary_value_all = {}
     
     summary_dt_list = []
     summary_dt = []
@@ -127,11 +144,19 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
     for data in data_list:
         
         value = getattr(data, field_name)
-        if not value:
-            continue
         
         if current_dt - dpv < data.created <= current_dt:
             summary_value.append(value)
+            
+            # Generate all field
+            for fn in field_name_list:
+                try:
+                    summary_value_all[fn]
+                except:
+                    summary_value_all[fn] = []
+                    
+                summary_value_all[fn].append(getattr(data, fn))
+                
             summary_dt.append(data.created)
         
         if data.created <= current_dt - dpv:
@@ -141,8 +166,19 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
                 summary_value = None
             else:
                 summary_value = np.mean(medfilt1(summary_value, 8))
-
+            
             summary_value_list.append(summary_value)
+            
+            
+            # Generate all field
+            for fn in field_name_list:
+                if not summary_value_all.get(fn):
+                    summary_value_all[fn] = None
+                else:
+                    summary_value_all[fn] = np.mean(medfilt1(summary_value_all[fn], 8))
+                    
+                summary_value_all_list.append(summary_value_all)
+
            
             if not summary_dt:
                 summary_dt = current_dt
@@ -160,6 +196,10 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
             
                 if getattr(cache, field_name) == None:
                     setattr(cache, field_name, summary_value)
+                    
+                    # Generate all field
+                    for fn in field_name_list:
+                        setattr(cache, fn, summary_value_all[fn])
                     cache.save()
             
             summary_dt_list.append(summary_dt.strftime("%Y-%m-%d"))
@@ -167,9 +207,10 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
             
             
             summary_value = []
+            summary_value_all = {}
             summary_dt = []
     
-    label = field_name
+    label = field_label_list[field_name]
     
     # merge cache and realtime data 
     summary_value_list.extend([getattr(cache, field_name) for cache in cache_list])
@@ -178,7 +219,6 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
     # calculate to water level
     if field_name == 'utrasonic' and sensor.formula:
         summary_value_list = [eval(sensor.formula) if x != None else x for x in summary_value_list]
-        label = 'Water Level'
     
     #add label to graph    
     summary_value_list.append(label)

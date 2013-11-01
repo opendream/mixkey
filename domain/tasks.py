@@ -180,7 +180,7 @@ def detect_sensor_lost():
         today = datetime.today()
         latest_data = sensor.data_set.latest('created')
      
-        if True or (latest_data.created <= today - timedelta(minutes=settings.DETECT_SENSOR_LOST_TIME)) and (latest_data.created > today - timedelta(minutes=settings.DETECT_SENSOR_LOST_TIME*2)):
+        if (latest_data.created <= today - timedelta(minutes=settings.DETECT_SENSOR_LOST_TIME)) and (latest_data.created > today - timedelta(minutes=settings.DETECT_SENSOR_LOST_TIME*2)):
             messages = [
                 'Detect sensor lost signal more than %s minutes.' % settings.DETECT_SENSOR_LOST_TIME,
                 'Project %s -- Sensor %s.' % (sensor.project.get_name(), sensor.get_name())

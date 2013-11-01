@@ -314,6 +314,7 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
     
     result = {'cols': cols, 'rows': result}
     
+    return result
     
 def data_create(request):
     

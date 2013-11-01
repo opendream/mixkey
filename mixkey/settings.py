@@ -202,7 +202,7 @@ PREV_DATA_BUFFER_TIME = 10 # miniutes
 MAX_REPEAT_ALERT = 5
 
 DETECT_SENSOR_LOST_TIME = 30 # miniutes
-DETECT_SENSOR_LOST_TEL_LIST = '+66897070170|panudate@opendream.co.th,+66897753337,+66842226566,+66804986837'
+DETECT_SENSOR_LOST_TEL_LIST = '+66897070170|panudate@opendream.co.th,+66897753337|patipat@opendream.co.th,+66842226566|paskorn@eng.cmu.ac.th,+66804986837|supamit.jankoo@gmail.com'
 
 # Email Settings #######################################################################################################
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

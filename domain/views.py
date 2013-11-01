@@ -10,6 +10,7 @@ from domain.functions import medfilt1, set_to_midnight
 from datetime import datetime, timedelta
 
 import numpy as np
+import copy
 
 field_name_list = ['utrasonic', 'temperature', 'humidity', 'raingauge', 'battery']
 field_label_list ={
@@ -125,14 +126,29 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
         pass
     
     current_dt = datetime.today()
-    current_dt = set_to_midnight(current_dt)
+    current_dt_midnight = set_to_midnight(current_dt)
+    origin_dt_midnight = current_dt_midnight
     
     # duration per value
     dpv = timedelta(days=method_map[method])
     
     # merge data from cache and realtime
     data_list = list(data_list.filter(created__lte=current_dt))
+    
+    try:
+        dummy = copy.copy(data_list[0])
+        dummy.created = set_to_midnight(dummy.created-timedelta(days=1))
+        data_list.append(dummy)
+        dummy = copy.copy(data_list[0])
+        dummy.created = set_to_midnight(dummy.created+timedelta(days=1))
+        data_list.insert(0, dummy)
+    except:
+        pass
+
         
+
+    
+    
     summary_value_list = []
     summary_value = []
     
@@ -144,11 +160,11 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
     
     end = len(data_list)
     
-    for data in data_list:
-        
+    for i, data in enumerate(data_list):
+                
         value = getattr(data, field_name)
         
-        if current_dt - dpv < data.created <= current_dt:
+        if current_dt_midnight < data.created:
             summary_value.append(value)
             
             # Generate all field
@@ -162,13 +178,18 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
                 
             summary_dt.append(data.created)
         
-        if data.created <= current_dt - dpv:
+        if data.created <= current_dt_midnight or i == end-1 or data.created >= current_dt:
 
-            current_dt = current_dt - dpv
+            current_dt_midnight = current_dt_midnight - dpv
+            
+            
             if not summary_value:
                 summary_value = None
             else:
-                summary_value = np.mean(medfilt1(summary_value, 8))
+                try:
+                    summary_value = np.mean(medfilt1(summary_value, 8))
+                except TypeError:
+                    summary_value = np.mean((summary_value))
             
             summary_value_list.append(summary_value)
             
@@ -178,20 +199,24 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
                 if not summary_value_all.get(fn):
                     summary_value_all[fn] = None
                 else:
-                    summary_value_all[fn] = np.mean(medfilt1(summary_value_all[fn], 8))
-                    
+                    try:
+                        summary_value_all[fn] = np.mean(medfilt1(summary_value_all[fn], 8))
+                    except TypeError:
+                        summary_value_all[fn] = np.mean((summary_value_all[fn]))
+                        
+                        
                 summary_value_all_list.append(summary_value_all)
 
            
             if not summary_dt:
-                summary_dt = current_dt
+                summary_dt = current_dt_midnight
             else: 
                 summary_dt = summary_dt[int(len(summary_dt)/2)]
                 
             summary_dt = set_to_midnight(summary_dt)
             
             # create cache if not exist
-            if not cache_latest_created or summary_dt > cache_latest_created:
+            if (not cache_latest_created or summary_dt > cache_latest_created) and (summary_dt < origin_dt_midnight-timedelta(days=1)):
                 try:
                     cache = InstCache.objects.get(sensor=sensor, created=summary_dt)
                 except InstCache.DoesNotExist:
@@ -215,6 +240,7 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
     
     label = field_label_list[field_name]
     
+
     # merge cache and realtime data 
     summary_value_list.extend([getattr(cache, field_name) for cache in cache_list])
     summary_dt_list.extend([cache.created.strftime("new Date(%Y, %m, %d)") for cache in cache_list])
@@ -285,11 +311,9 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
     for row in zip(*summary_list):
         row = {'c': [ {'v': c} for c in row]}
         result.append(row)
-        
+    
     result = {'cols': cols, 'rows': result}
     
-    
-    return result
     
 def data_create(request):
     

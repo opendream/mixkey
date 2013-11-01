@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db.models import Q
+from django.core.mail import send_mail
 
 from domain.models import Project, Sensor, Data, SMSLog
 from domain.templatetags.domain_tags import cm2m
@@ -12,7 +13,7 @@ from twilio.rest import TwilioRestClient
 import logging
 
 @task()
-def send_sms(project, message_body, category, sensor=None, created=None):
+def send_sms(project, message_body, category, sensor=None, created=None, subject=None):
     # Send message to tel list with Twilio
     message = None
     message_sid = []
@@ -30,19 +31,32 @@ def send_sms(project, message_body, category, sensor=None, created=None):
     else:
         tel_list = project.tel_list or ''
         
-
-    for tel in tel_list.split(','):
+    email_list = []
+    
+    for tel_email in tel_list.split(','):
         
-        tel = tel.strip()
+        tel_email = '%s|' % tel_email
+        tel_email = tel_email.split('|')
+        tel = tel_email[0].strip()
+        email = tel_email[1].strip()
         
         if settings.TWILIO_SEND_SMS and tel:
         
             message = client.messages.create(body=message_body, to=tel, from_=settings.TWILIO_FROM_NUMBER)
             message_sid.append(message.sid)
             tel_list_log.append(tel)
+        
+        if email:
+            email_list.append(email)
     
     message_sid = ','.join(message_sid)
     tel_list_log = ','.join(tel_list_log)
+    
+    
+    if not subject:
+        subject = message_body.split('\n')[0]
+        
+    send_mail(subject, message_body, settings.EMAIL_ADDRESS_NO_REPLY, email_list, fail_silently=False)
         
         
     if not created:
@@ -166,13 +180,14 @@ def detect_sensor_lost():
         today = datetime.today()
         latest_data = sensor.data_set.latest('created')
      
-        if (latest_data.created <= today - timedelta(minutes=settings.DETECT_SENSOR_LOST_TIME)) and (latest_data.created > today - timedelta(minutes=settings.DETECT_SENSOR_LOST_TIME*2)):
+        if True or (latest_data.created <= today - timedelta(minutes=settings.DETECT_SENSOR_LOST_TIME)) and (latest_data.created > today - timedelta(minutes=settings.DETECT_SENSOR_LOST_TIME*2)):
             messages = [
                 'Detect sensor lost signal more than %s minutes.' % settings.DETECT_SENSOR_LOST_TIME,
                 'Project %s -- Sensor %s.' % (sensor.project.get_name(), sensor.get_name())
             ]
             message_body = '\n'.join(messages)        
             
+            print sensor.get_name()
             send_sms(sensor.project, message_body, SMSLog.SENSOR_LOST, sensor=sensor, created=today)
                             
 

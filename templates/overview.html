@@ -190,7 +190,6 @@ google.maps.event.addDomListener(window, 'load', initialize);
   {% endif %}
     
   {% for sensor, data in sensor_list  %}    
-    
     <div class="panel panel-{{ data.get_category|category_to_class }} sensor-current">
       <div class="panel-heading">
         <h3 class="panel-title">

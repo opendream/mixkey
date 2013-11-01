@@ -108,8 +108,8 @@ class Sensor(models.Model):
             water_level = data.get_water_level
         except Data.DoesNotExist:
             pass
-        
-        if False and self.level_red and water_level >= self.level_red:
+
+        if self.level_red and water_level >= self.level_red:
             return 'RED'
         elif self.level_yellow and water_level >= self.level_yellow:
             return 'YELLOW'
@@ -162,9 +162,9 @@ class BaseData(models.Model):
         sensor = self.sensor
         water_level = self.get_water_level
         
-        if water_level >= sensor.level_red:
+        if sensor.level_red and water_level >= sensor.level_red:
             return 'RED'
-        elif water_level >= sensor.level_yellow and water_level < sensor.level_red:
+        elif sensor.level_yellow and water_level >= sensor.level_yellow:
             return 'YELLOW'
 
         return 'GREEN' 

@@ -11,7 +11,6 @@
 </script>
 <script type="text/javascript">
 
-
 function drawVisualization(elm, data, title) {
   // Some raw data (not necessarily accurate)
   /*
@@ -24,15 +23,24 @@ function drawVisualization(elm, data, title) {
     ['2008/09',  136,      691,         629,             1026,          366,      569.6]
   ]);
   */
-  var label = data[0][1];
-  data = google.visualization.arrayToDataTable(data);
+  var label = data.cols[1]['label'];
+  console.log(data.cols);
+  
+  data = new google.visualization.DataTable(data);
+  
+  
   
   var options = {
     title : title,
     vAxis: {title: label, minValue: null},
     hAxis: {title: "Date"},
     seriesType: "line",
-    series: {0: {type: "area"}}
+    series: {
+      0: {type: "area", color: '#3a87ad'}, 
+      1: {type: 'point', color:'#555555', pointSize: 5}, 
+      2: {color:'#b94a48'}, 
+      3: {color:'#c09853'}
+    }
   };
 
   var chart = new google.visualization.ComboChart(document.getElementById(elm));
@@ -55,6 +63,10 @@ data_summary_title_list[{{ sensor.id }}]  = '{{ sensor.get_name }}';
 
 google.setOnLoadCallback(function () {
   $.each(data_summary_list, function (key, data) {
+    $.each(data.rows, function (j, item) {
+      item['c'][0]['v'] = eval(item['c'][0]['v'])
+    });
+    
     drawVisualization('sensor-chart-' + key, data, data_summary_title_list[key]);
   })
 });

@@ -29,5 +29,3 @@ def jsonify(object):
     if isinstance(object, QuerySet):
         return serialize('json', object)
     return simplejson.dumps(object)
-
-register.filter('jsonify', jsonify)

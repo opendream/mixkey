@@ -4,7 +4,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound
 
-from domain.models import Project, Sensor, Data, DataDay, DataWeek, DataMonth, DataYear
+from domain.models import Project, Sensor, Data, DataDay, DataWeek, DataMonth, DataYear, SMSLog
 from domain.functions import medfilt1, set_to_midnight
 
 from datetime import datetime, timedelta
@@ -97,6 +97,9 @@ def project_overview(request, project_code=False, sensor_code=False):
         'field_name_list': field_name_list,
         'current_field': field_name
     })
+
+def sensor_get_lost_list(sensor):
+    SMSLog.objects.filter(sensor=sensor).order_by('-created')
 
 def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
     
@@ -202,7 +205,7 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
                         setattr(cache, fn, summary_value_all[fn])
                     cache.save()
             
-            summary_dt_list.append(summary_dt.strftime("%Y-%m-%d"))
+            summary_dt_list.append(summary_dt.strftime("new Date(%Y, %m, %d)"))
             
             
             
@@ -214,40 +217,79 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
     
     # merge cache and realtime data 
     summary_value_list.extend([getattr(cache, field_name) for cache in cache_list])
-    summary_dt_list.extend([cache.created.strftime("%Y-%m-%d") for cache in cache_list])
-    
+    summary_dt_list.extend([cache.created.strftime("new Date(%Y, %m, %d)") for cache in cache_list])
+        
     # calculate to water level
     if field_name == 'utrasonic' and sensor.formula:
         summary_value_list = [eval(sensor.formula) if x != None else x for x in summary_value_list]
+            
+
+    has_lost = False
+
+    lost_list = list(SMSLog.objects.filter(sensor=sensor).order_by('-created'))
+    if lost_list:
+        length = len(summary_dt_list)
+        summary_lost_list = [None]*length
+
+        for lost in lost_list:
+            try:
+                i = summary_dt_list.index(lost.created.strftime("new Date(%Y, %m, %d)"))
+                summary_dt_list.insert(i, lost.created.strftime("new Date(%Y, %m, %d, %H, %M)"))
+                summary_value_list.insert(i, summary_value_list[i])
+                summary_lost_list.insert(i, summary_value_list[i])
+            except ValueError:
+                has_lost = True
+                     
+                
     
-    #add label to graph    
-    summary_value_list.append(label)
-    summary_dt_list.append('Date')
+    cols = []
+    
+    #add label to graph 
+    cols.append({'id': 'date', 'label': 'Date', 'type': 'date'})
+    cols.append({'id': 'main', 'label': label, 'type': 'number'})
     
     # flip graph left to right
     summary_value_list.reverse()
     summary_dt_list.reverse()
     
+    
+    
     #prepare data for google api chart
     summary_list = [summary_dt_list, summary_value_list]
     
+    if has_lost:
+        cols.append({'id': 'lost', 'label': 'Sensor Lost', 'type': 'number'})
+        summary_lost_list.reverse()
+        
+        summary_list.append(summary_lost_list)
+        
     # add red yellow line
     if field_name == 'utrasonic':
         
         length = len(summary_dt_list)
         
         if sensor.level_red:
-            level_red_list = ['Red Level']
-            level_red_list.extend([sensor.level_red]*length)
+            cols.append({'id': 'red', 'label': 'Red Level', 'type': 'number'})
+            level_red_list = [sensor.level_red]*length
             summary_list.append(level_red_list)
         
         if sensor.level_yellow:
-            level_yellow_list = ['Yellow Level']
-            level_yellow_list.extend([sensor.level_yellow]*length)
+            cols.append({'id': 'yellow', 'label': 'Yellow Level', 'type': 'number'})
+            level_yellow_list = [sensor.level_yellow]*length
             summary_list.append(level_yellow_list)
         
-    return zip(*summary_list)
+
+        
+    # Prepare data to js    
+    result = []
+    for row in zip(*summary_list):
+        row = {'c': [ {'v': c} for c in row]}
+        result.append(row)
+        
+    result = {'cols': cols, 'rows': result}
     
+    
+    return result
     
 def data_create(request):
     

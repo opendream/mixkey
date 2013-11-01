@@ -109,9 +109,9 @@ class Sensor(models.Model):
         except Data.DoesNotExist:
             pass
         
-        if water_level >= self.level_red:
+        if self.level_red and water_level >= self.level_red:
             return 'RED'
-        elif water_level >= self.level_yellow and water_level < self.level_red:
+        elif self.level_yellow and water_level >= self.level_yellow:
             return 'YELLOW'
 
         return 'GREEN'

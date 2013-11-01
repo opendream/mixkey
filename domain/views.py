@@ -138,7 +138,7 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
     try:
         dummy = copy.copy(data_list[0])
         dummy.created = set_to_midnight(dummy.created+timedelta(days=1))
-        data_list.insert(0, dummy)
+        # data_list.insert(0, dummy)
     except:
         pass
 

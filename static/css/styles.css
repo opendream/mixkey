@@ -26,7 +26,7 @@ h1 {
 }
 
 .sensor-current {
-    min-width: 595px;
+    /*min-width: 595px;*/
 }
 .sensor-current .panel-body {
     padding-top: 0;
@@ -70,4 +70,61 @@ ul.select-unit {
 
 .box-underline {
     border-bottom: 1px solid #ddd;
+}
+
+
+
+
+
+/* Feel free to modify all of these styles */
+
+@media all and (max-width:500px) {
+    .data-other-field {
+        width: 100%;
+        clear: both;
+        border-left: 0px none;
+        padding-right: 15px;
+        box-sizing: border-box;        
+        
+    }
+    .data-primary-field {
+        margin-left: 15px;
+        margin-top: 15px;
+    }
+    .data-other-field .webks-responsive-table {
+        border-top: 1px solid #DDD;
+    }
+    
+
+}
+
+.data-other-field .webks-responsive-table dl {
+    border-bottom: 0px none;
+}
+
+/* Table */
+table.respond{ width:100%; }
+
+.webks-responsive-table .row {
+    margin-right: 15px;
+    margin-left: 15px;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-bottom: 20px;
+}
+.webks-responsive-table .switchBtn {
+    display: none;
+} 
+
+/* Responsive Data-List */
+.webks-responsive-table dt,
+.webks-responsive-table dd{
+	display:inline-block; /* instead use floats */
+	width:50%;
+	margin:0 0 1px 0;
+	padding:5px 1%;
+}
+.webks-responsive-table dt{ 
+	width:50%; 
+	vertical-align:top;
 }

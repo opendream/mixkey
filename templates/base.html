@@ -6,11 +6,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <link rel="stylesheet" href="{{ STATIC_URL }}libs/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}libs/jquery.webks-responsive-table/jquery.webks-responsive-table.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/styles.css">
         
     <script src="{{ STATIC_URL }}libs/jquery-1.10.2.min.js"></script>
+    <script src="{{ STATIC_URL }}libs/jquery.webks-responsive-table/jquery.webks-responsive-table.js"></script>
     <script src="{{ STATIC_URL }}libs/bootstrap/js/bootstrap.min.js"></script>
     
+    <script type="text/javascript">
+      $(function() {
+        $('body').addClass('javascript-active');
+
+        // ==================================================================================
+        //Call responsive table function (That's all you need!)
+        $('table.respond').responsiveTable({
+          // Configuration example:
+          displayResponsiveCallback : function() {
+            return $(document).width() < 700; // Show responsive if screen width < 500px
+          }
+        });
+        // ==================================================================================
+
+        // -- Further possibilities for automatic switch after page has been loaded --
+        // Update on Orientation Change!          
+        $(window).bind("orientationchange", function(e) {
+          setTimeout("$('table.respond').responsiveTableUpdate()", 100);
+        });
+
+        // Update on Window Resize! (May be buggy in some browsers, sorry.)
+        $(window).resize(function() {
+          $('table.respond').responsiveTableUpdate();
+        });
+      });
+    </script>
     {% block js %}{% endblock %}
     
   </head>

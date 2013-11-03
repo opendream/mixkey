@@ -280,7 +280,7 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
     #prepare data for google api chart
     summary_list = [summary_dt_list, summary_value_list]
     
-    if has_lost:
+    if False and has_lost:
         cols.append({'id': 'lost', 'label': 'Sensor Lost', 'type': 'number'})
         summary_lost_list.reverse()
         
@@ -300,12 +300,15 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
             cols.append({'id': 'yellow', 'label': 'Yellow Level', 'type': 'number'})
             level_yellow_list = [sensor.level_yellow]*length
             summary_list.append(level_yellow_list)
-        
+    
+    summary_list = []
+    for data in Data.objects.filter(sensor=sensor).order_by('-created')[0:500]:
+        summary_list.append((data.created.strftime("new Date(%Y, %m, %d, %H, %M)"), data.get_water_level_raw))
 
         
     # Prepare data to js    
     result = []
-    for row in zip(*summary_list):
+    for row in summary_list:
         row = {'c': [ {'v': c} for c in row]}
         result.append(row)
     

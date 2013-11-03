@@ -268,7 +268,7 @@ def data_summary(sensor, data_list, method='DataDay', field_name='utrasonic'):
     cols = []
     
     #add label to graph 
-    cols.append({'id': 'date', 'label': 'Date', 'type': 'date'})
+    cols.append({'id': 'date', 'label': 'Date', 'type': 'datetime'})
     cols.append({'id': 'main', 'label': label, 'type': 'number'})
     
     # flip graph left to right

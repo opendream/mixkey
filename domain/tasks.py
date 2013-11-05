@@ -2,15 +2,18 @@ from django.conf import settings
 from django.db.models import Q
 from django.core.mail import send_mail
 
-from domain.models import Project, Sensor, Data, SMSLog
+from domain.models import Project, Sensor, SMSLog, Data, DataTenMinute, DataThirtyMinute, DataHour, DataDay, DataWeek, DataMonth, DataYear, SMSLog
 from domain.templatetags.domain_tags import cm2m
 
 from celery.decorators import task
 from datetime import date, time, datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 from twilio.rest import TwilioRestClient
 
 import logging
+import re
+import numpy as np
 
 @task()
 def send_sms(project, message_body, category, sensor=None, created=None, subject=None):
@@ -189,8 +192,182 @@ def detect_sensor_lost():
             
             print sensor.get_name()
             send_sms(sensor.project, message_body, SMSLog.SENSOR_LOST, sensor=sensor, created=today)
-                            
+
+# Cache data
+
+minutes_map_list = [
+    ('DataYear', 365*24*60),
+    ('DataMonth', 30*24*60),
+    ('DataWeek', 7*24*60),
+    ('DataDay', 1*24*60),
+    ('DataHour', 60),
+    ('DataThirtyMinute', 30),
+    ('DataTenMinute', 10),
+]
+
+minutes_map = dict(minutes_map_list)
+
+def get_datetime_label(op):
+    label = re.findall('[A-Z][^A-Z]*', op)[-1].lower()
+    if label == 'week':
+        label = 'day'
+    return label
+    
+def floor_time(dt, op):
+    
+    minutes = minutes_map[op]
+    
+    args = {'seconds': dt.second, 'microseconds': dt.microsecond}
+    has_mt = False
+    
+    for key, step_minutes in minutes_map_list:
+        
+        label = get_datetime_label(key)
+        mt = minutes/step_minutes
+                        
+        if mt > 0 and not has_mt:
+
+            has_mt = True
+            
+            if minutes >= minutes_map['DataMonth']:
+                mod = getattr(relativedelta(months=minutes/minutes_map['DataMonth']), '%ss' % label)
+            else:
+                mod = getattr(relativedelta(minutes=minutes), '%ss' % label)
+            
+            args['%ss' % label] = getattr(dt, label) % mod
+            
+            minutes = minutes - step_minutes
+            
+        elif mt <= 0 and has_mt and not args.get('%ss' % label):
+            args['%ss' % label] = getattr(dt, label)
+                        
+    result = dt - relativedelta(**args)
+    
+    if op == 'DataWeek':
+        result = result - timedelta(days=result.weekday())
+    
+    return result
 
 
+def merge_data_field(data_list):
+    
+    if not data_list.size:
+        return False
+    
+    field_name_list = ['utrasonic', 'temperature', 'humidity', 'raingauge', 'battery']
+    
+    
+    data_step = dict(zip(field_name_list, [None]*len(field_name_list)))
+    
+    has_value = False
+    
+    for field_name in field_name_list:
+        
+        value_list = []
+        for data in data_list:
+            fv = getattr(data, field_name)
+            if fv != None:
+                value_list.append(fv)
+                        
+        value = None
+        if value_list:
+            value = sum(value_list) if field_name == 'raingauge' else np.mean(value_list)
+        
+        if value != None and not np.isnan(value):
 
+            data_step[field_name] = value
+            has_value = True
+        
+    return data_step if has_value else False
+
+    
+def build_cache():
+    
+    now = datetime.today()
+    
+    # Prepare data maping
+
+    
+    field_name_list = [f.name for f in Data._meta.fields]
+
+    inst_list = ['Data', 'DataTenMinute', 'DataThirtyMinute', 'DataHour', 'DataDay', 'DataWeek', 'DataMonth', 'DataYear']
+
+    pil = list(inst_list)
+    pil.append(False)
+    cil = list(inst_list)
+    cil.insert(0, False)
+
+    parent_map = dict(zip(cil, pil))
+    del(parent_map[False])
+    child_map = dict(zip(pil, cil))
+    del(child_map[False])
+    
+    
+    # Start loop of sensor list
+    
+    
+    
+    for sensor in Sensor.objects.all():
+        
+        inst = 'Data'
+        
+        while inst:
+            
+            inst = parent_map[inst]
+            
+            if not inst:
+                continue
+
+            # Prepare data
+            data_list = eval(child_map[inst]).objects.filter(sensor=sensor).order_by('created')
+            
+            InstCache = eval(inst)
+            try:
+                cache_latest = InstCache.objects.filter(sensor=sensor).latest('created')
+                data_list = data_list.filter(created__gt=cache_latest.created)
+            except InstCache.DoesNotExist:
+                cache_latest = None
+                
+            minutes = minutes_map[inst]
+            
+            # Check if can buid cache via dateime delta
+            if cache_latest and now - cache_latest.created <= timedelta(minutes=minutes):
+                continue
+                
+            data_list = data_list.values_list()
+
+            if not data_list:
+                continue
+                
+            data_list = np.core.records.fromrecords(data_list, names=field_name_list)
+            
+            cache_created_list = {}
+                                
+            for data in data_list:
+                
+                prev_time = floor_time(data.created-timedelta(minutes=minutes), inst)
+                created   = floor_time(data.created, inst)
+                
+                if cache_created_list.get(created):
+                    continue
+                    
+                step_list = data_list[((data_list['created'] > prev_time) & (data_list['created'] <= created))]
+                step = merge_data_field(step_list)
+                
+                if not step:
+                    continue
+                    
+                step['sensor'] = sensor
+                step['created'] = created
+                
+                cache = InstCache(**step)
+                cache.save()
+                
+                cache_created_list[created] = True
+                
+                    
+                print 'Sensor -- %s, Inst -- %s, Date -- %s' % (sensor, inst, created)
+            
+            
+            
 

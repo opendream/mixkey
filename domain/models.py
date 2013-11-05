@@ -219,6 +219,12 @@ class SMSLog(models.Model):
 class Data(BaseData):
     pass
 # Cache data table
+class DataTenMinute(BaseData):
+    pass
+class DataThirtyMinute(BaseData):
+    pass
+class DataHour(BaseData):
+    pass
 class DataDay(BaseData):
     pass
 class DataWeek(BaseData):

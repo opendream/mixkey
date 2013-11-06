@@ -3,6 +3,8 @@ from django.db.models.query import QuerySet
 from django.utils import simplejson
 from django import template
 
+import re
+
 register = template.Library()
 
 @register.filter(name='category_to_class')
@@ -29,3 +31,11 @@ def jsonify(object):
     if isinstance(object, QuerySet):
         return serialize('json', object)
     return simplejson.dumps(object)
+
+@register.filter(name='every_datetime')  
+def every_datetime(value):
+    value = ' '.join(re.findall('[A-Z][^A-Z]*', value)[1:])
+    if not value:
+        value = 'one minute'
+    return 'Every %ss' % value
+    

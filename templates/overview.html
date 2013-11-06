@@ -71,9 +71,13 @@ google.setOnLoadCallback(function () {
 
 jQuery(document).ready(function () {
   jQuery('#graph-select a').click(function () {
-    jQuery('#graph-render-list').html('');
-    jQuery('#loading-img').css('display', 'block').appendTo('#graph-render-list');
-    window.location = jQuery(this).attr('href');
+    
+    if (jQuery(this).attr('id') != 'select-graph') {
+    
+      jQuery('#graph-render-list').html('');
+      jQuery('#loading-img').css('display', 'block').appendTo('#graph-render-list');
+      window.location = jQuery(this).attr('href');
+    }
   });
 });
 
@@ -246,8 +250,24 @@ google.maps.event.addDomListener(window, 'load', initialize);
   <div class="panel-body">
     <ul class="nav nav-tabs" id="graph-select">
       {% for field_name in field_name_list %}
-      <li{% if current_field == field_name %} class="active"{% endif %}><a href="?field={{ field_name }}#graph" data-toggle="tab">{{ field_name|title }}</a></li>
+      <li{% if current_field == field_name %} class="active"{% endif %}>
+        <a href="?field={{ field_name }}&range={{ current_op }}#graph" data-toggle="tab">{{ field_name|title }}</a>
+      </li>
       {% endfor %}
+      <li class="dropdown select-range">
+        <a id="select-graph" class="dropdown-toggle" data-toggle="dropdown" href="#">
+          {{ current_op|every_datetime }} <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+          <li class="dropdown-header">Select report</li>
+          <li class="divider"></li>          
+          {% for op, label in data_range_list %}
+          <li{% if current_op == op %} class="active"{% endif %}>
+            <a href="?field={{ current_field }}&range={{ op }}#graph">{{ label }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </li>
     </ul>
   </div>
   <div class="panel-body" id="graph-render-list">

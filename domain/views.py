@@ -7,11 +7,12 @@ from django.forms.models import model_to_dict
 
 from domain.models import Project, Sensor, Data, DataTenMinute, DataThirtyMinute, DataHour, DataDay, DataWeek, DataMonth, DataYear, SMSLog
 from domain.functions import medfilt1, set_to_midnight
+from domain.tasks import minutes_map_list, get_datetime_label
 
 from datetime import datetime, timedelta
 
 import numpy as np
-import copy
+import copy, re
 
 field_name_list = ['utrasonic', 'temperature', 'humidity', 'raingauge', 'battery']
 field_label_list ={
@@ -20,26 +21,6 @@ field_label_list ={
     'humidity'   : 'Humidity (%)', 
     'raingauge'  : 'Raingauge (mm.)', 
     'battery'    : 'Battery (%)'
-}
-inst_minutes = {
-    'DataYear': 365*24*60,
-    'DataMonth': 30*24*60,
-    'DataWeek': 7*24*60,
-    'DataDay': 1*24*60,
-    'DataHour': 60,
-    'DataThirtyMinute': 30,
-    'DataTenMinute': 10,
-    'Data': 1,
-}
-child_map = {
-    'DataYear': 'DataMonth',
-    'DataMonth': 'DataWeek',
-    'DataWeek': 'DataDay',
-    'DataDay': 'DataHour',
-    'DataHour': 'DataThirtyMinute',
-    'DataThirtyMinute': 'DataTenMinute',
-    'DataTenMinute': 'Data',
-    'Data': 'Data',
 }
 
 def home(request):
@@ -84,6 +65,7 @@ def project_overview(request, project_code=False, sensor_code=False):
     project_list = []
     
     field_name = request.GET.get('field') or 'utrasonic'
+    op = request.GET.get('range') or 'DataDay'
     
     for project in project_query:
         
@@ -99,7 +81,7 @@ def project_overview(request, project_code=False, sensor_code=False):
             data = False
             sensor_data_list = sensor.data_set.order_by('-created')
                         
-            sensor.data_summary = data_summary(sensor, op='DataDay', field_name=field_name)
+            sensor.data_summary = data_summary(sensor, op=op, field_name=field_name)
             
             try:
                 data = sensor_data_list[0]
@@ -111,13 +93,25 @@ def project_overview(request, project_code=False, sensor_code=False):
         
         if sensor_list:   
             project_list.append((project, sensor_list))
+            
+    data_range_list = list(minutes_map_list)
+    
+    for i, item in enumerate(data_range_list):
+        key, value = item
+        
+        value = 'Every %ss' % ' '.join(re.findall('[A-Z][^A-Z]*', key)[1:]).lower()    
+        data_range_list[i] = (key, value)
+        
+    data_range_list.append(('Data', 'Every one minutes'))
         
     return render(request, 'overview.html', {
         'data_list': data_list, 
         'project_list': project_list,
         'sensor_selected': sensor_selected,
         'field_name_list': field_name_list,
-        'current_field': field_name
+        'current_field': field_name,
+        'current_op': op,
+        'data_range_list': data_range_list,
     })
     
     

@@ -72,6 +72,9 @@ ul.select-unit {
     border-bottom: 1px solid #ddd;
 }
 
+.nav-tabs>li.select-range {
+    float: right;
+}
 
 
 

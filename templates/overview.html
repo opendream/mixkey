@@ -30,13 +30,13 @@ function drawVisualization(elm, data, title) {
   var options = {
     title : title,
     vAxis: {title: label, minValue: null},
-    hAxis: {title: "Date"},
+    hAxis: {title: "Date", minValue: new Date()},
     seriesType: "line",
     series: {
       0: {type: "area", color: '#3a87ad'}, 
-      //1: {type: 'point', color:'#555555', pointSize: 5}, 
-      1: {color:'#b94a48'}, 
-      2: {color:'#c09853'}
+      1: {type: 'point', color:'#555555', pointSize: 5}, 
+      2: {color:'#b94a48'}, 
+      3: {color:'#c09853'}
     }
   };
 

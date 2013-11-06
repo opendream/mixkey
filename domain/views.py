@@ -19,7 +19,7 @@ field_label_list ={
     'temperature': 'Temperature (℃)', 
     'humidity'   : 'Humidity (%)', 
     'raingauge'  : 'Raingauge (mm.)', 
-    'battery'    : 'Battery (V)'
+    'battery'    : 'Battery (%)'
 }
 inst_minutes = {
     'DataYear': 365*24*60,
@@ -99,7 +99,7 @@ def project_overview(request, project_code=False, sensor_code=False):
             data = False
             sensor_data_list = sensor.data_set.order_by('-created')
                         
-            sensor.data_summary = data_summary(sensor, sensor_data_list, op='DataDay', field_name=field_name)
+            sensor.data_summary = data_summary(sensor, op='DataDay', field_name=field_name)
             
             try:
                 data = sensor_data_list[0]
@@ -119,154 +119,90 @@ def project_overview(request, project_code=False, sensor_code=False):
         'field_name_list': field_name_list,
         'current_field': field_name
     })
-
-def sensor_get_lost_list(sensor):
-    SMSLog.objects.filter(sensor=sensor).order_by('-created')
-
-
-def merge_data_field(data_list):
-    data_step = dict(zip(field_name_list, [None]*len(field_name_list)))
-
-    if data_list.size:
-        for field_name in field_name_list:
-            
-            value_list = []
-            for data in data_list:
-                fv = getattr(data, field_name)
-                if fv != None:
-                    value_list.append(fv)
-                    
-            field_type = Data._meta.get_field(field_name).get_internal_type()
-            
-            value = None
-            if value_list:
-                value = sum(value_list) if field_name == 'raingauge' else np.mean(value_list)
-            
-            if value != None and not np.isnan(value):
-
-                data_step[field_name] = value
-            
-    return data_step
-
-def data_set_step_object(cdl, sensor, op, created):
-        
-    DataInst = eval(op)
-    
-    child_op = child_map[op]
-    #DataInstChild = eval(child_op)
-    
-    minutes = inst_minutes[op]
-    prev_time = created-timedelta(minutes=minutes)
-    
-    cdlc = cdl[child_op]
-    
-    try:
-        data_list = cdlc[((cdlc['created'] >= prev_time) & (cdlc['created'] < created))]
-        #data_list = list(DataInstChild.objects.filter(sensor=sensor,created__gte=prev_time, created__lt=created).order_by('-created'))
-    except TypeError:
-        data_list = np.array([])
-        
-    if op != 'Data' and not data_list.size:
-        curr = created
-        
-        data_list = []
-        while curr >= prev_time:
-            tmp = data_get_step_object(cdl, sensor, child_op, curr)
-            tmp = tmp.tolist()
-            data_list.append(tmp)
-            curr = curr - timedelta(minutes=inst_minutes[child_op])
-        
-        data_list = np.core.records.fromrecords(data_list, names=[f.name for f in Data._meta.fields])
-        
-    data_step = merge_data_field(data_list)
-    data_step['sensor'] = sensor
-    data_step['created'] = prev_time
-    
-    data_inst = DataInst(**data_step)
-    if data_list.size and created - data_list[-1].created > timedelta(minutes=minutes):
-        data_inst.save()
-    else:
-        data_inst.id = None
-    
-    data_inst_dict = model_to_dict(data_inst)
-    data_inst = []
-    for f in Data._meta.fields:
-        data_inst.append(data_inst_dict[f.name])
-        
-    data_inst = np.core.records.fromrecords([data_inst], names=[f.name for f in Data._meta.fields])
-
-    return data_inst[0]
-        
-
-def data_get_step_object(cdl, sensor, op, created):
-    minutes = inst_minutes[op]
-    
-    prev_time = created-timedelta(minutes=minutes)
-    #DataInst = eval(op)
-    
-    cdld = cdl[op]
-    
-    try:
-        data_list = cdld[((cdld['created'] >= prev_time) & (cdld['created'] < created))]
-        #data_list = list(DataInst.objects.filter(sensor=sensor, created__gte=prev_time, created__lt=created))
-    except TypeError:
-        data_list = np.array([])
-    
-    if not data_list.size:
-        return data_set_step_object(cdl, sensor, op, created)
-    else:
-        return data_list[0]
-        
     
     
-def data_summary(sensor, data_list, op='DataDay', field_name='utrasonic', limit=200):
+def data_summary(sensor, op='DataDay', field_name='utrasonic'):
     
+    # Define
+    field_name_list = [f.name for f in Data._meta.fields]
+    label = field_label_list[field_name]
     timezone = sensor.project.timezone
-        
-    DataInst = eval(op)
-    cache_list = DataInst.objects.filter(sensor=sensor).order_by('-created')
     
+    InstCache = eval(op)
+    
+    # prepare cache
+    cache_list = list(InstCache.objects.filter(sensor=sensor).order_by('-created')[0:500])
+    cache_list.reverse()
+    cache_list.append(InstCache(sensor=sensor, created=datetime.today()))
+    
+    lost_list = []
     try:
-        data_list.filter(created__gt=cache_list[0].created)
-    except IndexError:
+        lost_list = list(SMSLog.objects.filter(sensor=sensor, category=SMSLog.SENSOR_LOST, created__gte=cache_list[0].created).order_by('-created'))
+    except InstCache.DoesNotExist:
         pass
+    
+    
+    data_list = []
+    lost_value = None
+    for cache in cache_list:
         
-    
-    cdl = {}
-    inst = op
-    while (inst != 'Data'):
-        cdl[inst] =  eval(inst).objects.filter(sensor=sensor).order_by('-created').values_list()
-        if cdl[inst]:
-            cdl[inst] = np.core.records.fromrecords(cdl[inst], names=[f.name for f in Data._meta.fields])
-
-        inst = child_map[inst]
-    
-    cdl['Data'] = Data.objects.filter(sensor=sensor).order_by('-created').values_list()
-    cdl['Data'] = np.core.records.fromrecords(cdl['Data'], names=[f.name for f in Data._meta.fields])
-    
-    data_list = cdl['Data']
+        created = cache.created.strftime("new Date(%Y, %m-1, %d, %H+" + str(timezone) + ", %M)")
+        value = getattr(cache, field_name)
+        
+        if field_name == 'utrasonic' and value is not None and sensor.formula:
+            x = value
+            value = eval(sensor.formula)
             
-    
-    result = []
-    latest_sdata = []
-    
-    curr_sdata = False
-    
-    for data in data_list:
-        sdata = data_get_step_object(cdl, sensor, op, data.created)
-        #from db
-        if sdata.id and (not curr_sdata or sdata.id != curr_sdata.id):
-            curr_sdata = sdata
-            result.append(sdata)
-        #from memory
-        elif not sdata.id:
-            latest_sdata.append(sdata)
-    
-    if latest_sdata:
-        latest_sdata = merge_data_field(latest_sdata)
-        result.insert(0, latest_sdata)    
+        #elif field_name == 'battery' and value is not None:
+        #    value = float(12.5-value)/float(12.5-10.5)*100
         
+        data = [created, value, None]
+        
+        
+        if value is not None:
+            lost_value = value
+            
+        # insert 1 row lost data
+        while lost_list and lost_list[-1].created < cache.created:
+            lost = lost_list.pop()
+            
+            data_list.append([(lost.created - timedelta(minutes=30)).strftime("new Date(%Y, %m-1, %d, %H+" + str(timezone) + ", %M)"), value, lost_value])
+            data_list.append([(lost.created - timedelta(minutes=30)).strftime("new Date(%Y, %m-1, %d, %H+" + str(timezone) + ", %M)"), value, None])
+                    
+        data_list.append(data)
+        
+    
+    cols = [
+        {'id': 'date', 'label': 'Date', 'type': 'datetime'},
+        {'id': 'main', 'label': label, 'type': 'number'},
+        {'id': 'lost', 'label': 'Sensor Lost', 'type': 'number'}
+    ]
+    
+    if field_name == 'utrasonic':
+        length = len(data_list)
+    
+        if sensor.level_red:
+            cols.append({'id': 'red', 'label': 'Red Level', 'type': 'number'})
+            data_list = zip(*data_list)
+            data_list.append([sensor.level_red]*length)
+            data_list = zip(*data_list)
+    
+        if sensor.level_yellow:
+            cols.append({'id': 'yellow', 'label': 'Yellow Level', 'type': 'number'})
+            data_list = zip(*data_list)
+            data_list.append([sensor.level_yellow]*length)
+            data_list = zip(*data_list)
+            
+    # Prepare data to js    
+    result = []
+    for row in data_list:
+        row = {'c': [ {'v': c} for c in row]}
+        result.append(row)
+    
+    result = {'cols': cols, 'rows': result}
+    
     return result
+
     
 def data_create(request):
     

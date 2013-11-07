@@ -75,6 +75,11 @@ ul.select-unit {
 .nav-tabs>li.select-range {
     float: right;
 }
+.select-language {
+    min-width: 64px;
+    margin: 0;
+    padding: 0;
+}
 
 
 

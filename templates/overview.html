@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load i18n %}
 {% load domain_tags %}
 
 {% block js %}
@@ -23,14 +23,15 @@ function drawVisualization(elm, data, title) {
     ['2008/09',  136,      691,         629,             1026,          366,      569.6]
   ]);
   */
-  var label = data.cols[1]['label'];
+  var label_v = data.cols[1]['label'];
+  var label_h = data.cols[0]['label'];
   
   data = new google.visualization.DataTable(data);  
   
   var options = {
     title : title,
-    vAxis: {title: label, minValue: null},
-    hAxis: {title: "Date", minValue: new Date()},
+    vAxis: {title: label_v, minValue: null},
+    hAxis: {title: label_h, minValue: new Date()},
     seriesType: "line",
     series: {
       0: {type: "area", color: '#3a87ad'}, 
@@ -169,16 +170,16 @@ google.maps.event.addDomListener(window, 'load', initialize);
 
 <h1>
   {% if sensor_selected %}
-  <a href="{% url 'project_overview' sensor_selected.project.code.lower %}">[{{ project_selected.get_name }}]</a> Sensor - {{ sensor_selected.get_name }}
+  <a href="{% url 'project_overview' sensor_selected.project.code.lower %}">[{{ project_selected.get_name }}]</a> {% trans 'Sensor' %} - {{ sensor_selected.get_name }}
   {% elif project_selected %}
-  [{{ project_selected.get_name }}] Latest Update
+  [{{ project_selected.get_name }}] {% trans 'Latest Update' %}
   {% else %}
-  All Projects
+  {% trans 'All Projects' %}
   {% endif %}
 </h1>
 
 {% if sensor_selected and sensor_selected.lat and sensor_selected.lng %}
-<h2 class="project-title">Location</h2>
+<h2 class="project-title">{% trans 'Location' %}</h2>
 <div id="map-canvas"></div>
 {% endif %}
 
@@ -186,7 +187,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 {% for project, sensor_list in project_list %}
   
   {% if not project_selected %}
-  <h2 class="project-title">{{ project.get_name }}<a class="label-active-project" href="{% url 'project_overview' project.code.lower %}">[Active to this project]</a></h2>
+  <h2 class="project-title">{{ project.get_name }}<a class="label-active-project" href="{% url 'project_overview' project.code.lower %}">[{% trans 'Active to this project' %}]</a></h2>
   {% endif %}
   
   {% if project.description %}
@@ -200,26 +201,26 @@ google.maps.event.addDomListener(window, 'load', initialize);
           {% if sensor_selected %}
           Sensor - {{ sensor.get_name }}
           {% else %}
-          <a href="{% url 'sensor_overview' sensor.project.code.lower sensor.code.lower %}">Sensor - {{ sensor.get_name }}</a>
+          <a href="{% url 'sensor_overview' sensor.project.code.lower sensor.code.lower %}">{% trans 'Sensor' %} - {{ sensor.get_name }}</a>
           {% endif %}
           <div class="label-category-code label label-{{ data.get_category|category_to_class }}">{{ data.get_category}} CODE</div>
         </h3>
       </div>
       <div class="panel-body">
         <div class="data-field data-primary-field">
-          <h4 class="data-primary-field-label">Water Level MSL</h4>
-          <div class="data-primary-field-value">{{ data.get_water_level }} cm.</div>          
+          <h4 class="data-primary-field-label">{% trans 'Water Level MSL' %}</h4>
+          <div class="data-primary-field-value">{{ data.get_water_level }} {% trans 'cm.' %}</div>          
         </div>
         <div class="data-field data-other-field">
           <table class="table table-striped respond">
             <thead>
               <tr>
                 <th> </th>
-                <th>Temperature (&#8451;)</th>
-                <th>Humidity (%)</th>
-                <th>Raingauge (mm.)</th>
-                <th>Battery (V)</th>
-                <th>Date Time</th>
+                <th>{% trans 'Temperature (&#8451;)' %}</th>
+                <th>{% trans 'Humidity (%)' %}</th>
+                <th>{% trans 'Raingauge (mm.)' %}</th>
+                <th>{% trans 'Battery (V)' %}</th>
+                <th>{% trans 'Date Time' %}</th>
               </tr>
             </thead>
             <tbody>
@@ -246,12 +247,12 @@ google.maps.event.addDomListener(window, 'load', initialize);
 
 <div class="panel panel-default" id="graph">
   <!-- Default panel contents -->
-  <div class="panel-heading"><h4>Graph</h4></div>
+  <div class="panel-heading"><h4>{% trans 'Graph' %}</h4></div>
   <div class="panel-body">
     <ul class="nav nav-tabs" id="graph-select">
       {% for field_name in field_name_list %}
       <li{% if current_field == field_name %} class="active"{% endif %}>
-        <a href="?field={{ field_name }}&range={{ current_op }}#graph" data-toggle="tab">{{ field_name|title }}</a>
+        <a href="?field={{ field_name }}&range={{ current_op }}#graph" data-toggle="tab">{%trans field_name|title %}</a>
       </li>
       {% endfor %}
       <li class="dropdown select-range">
@@ -259,11 +260,11 @@ google.maps.event.addDomListener(window, 'load', initialize);
           {{ current_op|every_datetime }} <span class="caret"></span>
         </a>
         <ul class="dropdown-menu">
-          <li class="dropdown-header">Select report</li>
+          <li class="dropdown-header">{% trans 'Select report' %}</li>
           <li class="divider"></li>          
           {% for op, label in data_range_list %}
           <li{% if current_op == op %} class="active"{% endif %}>
-            <a href="?field={{ current_field }}&range={{ op }}#graph">{{ label }}</a>
+            <a href="?field={{ current_field }}&range={{ op }}#graph">{%trans label %}</a>
           </li>
           {% endfor %}
         </ul>
@@ -290,29 +291,24 @@ google.maps.event.addDomListener(window, 'load', initialize);
 
 <div class="realtime-pannel panel panel-default">
   <!-- Default panel contents -->
-  <div class="panel-heading"><h4>Real-time Data</h4></div>
-  {% if not sensor_selected %}
-  <div class="panel-body">
-    <p>This raw data received from sensors name are Mixkey, received every minutes in each sensors and order by newest first.</p>
-  </div>
-  {% endif %}
+  <div class="panel-heading"><h4>{% trans 'Real-time Data' %}</h4></div>
   
   <table class="table table-striped respond">
     <thead>
       <tr>
         <th> </th>
         {% if not project_selected %}
-        <th>Project</th>
+        <th>{% trans 'Project' %}</th>
         {% endif %}
         {% if not sensor_selected %}
-        <th>Sensor</th>
+        <th>{% trans 'Sensor' %}</th>
         {% endif %}
-        <th>Water Level MSL (cm.)</th>
-        <th>Temperature (&#8451;)</th>
-        <th>Humidity (%)</th>
-        <th>Raingauge (mm.)</th>
-        <th>Date Time</th>
-        <th>Code</th>
+        <th>{% trans 'Water Level MSL (cm.)' %}</th>
+        <th>{% trans 'Temperature (&#8451;)' %}</th>
+        <th>{% trans 'Humidity (%)' %}</th>
+        <th>{% trans 'Raingauge (mm.)' %}</th>
+        <th>{% trans 'Date Time' %}</th>
+        <th>{% trans 'Code' %}</th>
       </tr>
     </thead>
     <tbody>

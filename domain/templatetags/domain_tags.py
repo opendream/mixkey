@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+
 from django.core.serializers import serialize
 from django.db.models.query import QuerySet
 from django.utils import simplejson
 from django import template
+from django.utils.translation import ugettext as _
 
 import re
 
@@ -34,8 +37,8 @@ def jsonify(object):
 
 @register.filter(name='every_datetime')  
 def every_datetime(value):
-    value = ' '.join(re.findall('[A-Z][^A-Z]*', value)[1:])
+    value = ' '.join(re.findall('[A-Z][^A-Z]*', value.encode('utf-8'))[1:])
     if not value:
         value = 'one minute'
-    return 'Every %ss' % value
+    return _('Every %ss' % value.lower())
     

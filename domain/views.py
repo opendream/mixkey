@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 
 # Create your views here.
+from django import http
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound
 from django.forms.models import model_to_dict
+from django.utils import translation
+from django.conf import settings
+from django.utils.translation import check_for_language, ugettext as _
 
 from domain.models import Project, Sensor, Data, DataTenMinute, DataThirtyMinute, DataHour, DataDay, DataWeek, DataMonth, DataYear, SMSLog
 from domain.functions import medfilt1, set_to_midnight
@@ -17,10 +21,10 @@ import copy, re
 field_name_list = ['utrasonic', 'temperature', 'humidity', 'raingauge', 'battery']
 field_label_list ={
     'utrasonic'  : 'Water Level (cm.)', 
-    'temperature': 'Temperature (℃)', 
+    'temperature': 'Temperature (&#8451;)', 
     'humidity'   : 'Humidity (%)', 
     'raingauge'  : 'Raingauge (mm.)', 
-    'battery'    : 'Battery (%)'
+    'battery'    : 'Battery (V)'
 }
 
 def home(request):
@@ -167,22 +171,22 @@ def data_summary(sensor, op='DataDay', field_name='utrasonic'):
         
     
     cols = [
-        {'id': 'date', 'label': 'Date', 'type': 'datetime'},
-        {'id': 'main', 'label': label, 'type': 'number'},
-        {'id': 'lost', 'label': 'Sensor Lost', 'type': 'number'}
+        {'id': 'date', 'label': _('Date'), 'type': 'datetime'},
+        {'id': 'main', 'label': _(label), 'type': 'number'},
+        {'id': 'lost', 'label': _('Lost Signal'), 'type': 'number'}
     ]
     
     if field_name == 'utrasonic':
         length = len(data_list)
     
         if sensor.level_red:
-            cols.append({'id': 'red', 'label': 'Red Level', 'type': 'number'})
+            cols.append({'id': 'red', 'label': _('Red Level'), 'type': 'number'})
             data_list = zip(*data_list)
             data_list.append([sensor.level_red]*length)
             data_list = zip(*data_list)
     
         if sensor.level_yellow:
-            cols.append({'id': 'yellow', 'label': 'Yellow Level', 'type': 'number'})
+            cols.append({'id': 'yellow', 'label': _('Yellow Level'), 'type': 'number'})
             data_list = zip(*data_list)
             data_list.append([sensor.level_yellow]*length)
             data_list = zip(*data_list)
@@ -249,3 +253,23 @@ def data_create(request):
     
     return HttpResponse('Data store completed: project: %s, sensor: %s, utrasonic: %s, temperature: %s, humidity: %s, raingauge: %s, battery: %s' % (project.code, sensor.code, utrasonic, temperature, humidity, raingauge, battery))
     
+
+
+
+def set_language(request):
+    next = request.REQUEST.get('next', None)
+    if not next:
+        next = request.META.get('HTTP_REFERER', None)
+    if not next:
+        next = '/'
+    response = http.HttpResponseRedirect(next)
+    if request.method == 'GET':
+        lang_code = request.GET.get('lang', None)
+        if lang_code and check_for_language(lang_code):
+            if hasattr(request, 'session'):
+                request.session['django_language'] = lang_code
+            else:
+                response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code)
+            translation.activate(lang_code)
+            
+    return response

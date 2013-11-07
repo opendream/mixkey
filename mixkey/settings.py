@@ -40,9 +40,26 @@ LANGUAGE_CODE = 'en-us'
 
 SITE_ID = 1
 
+
+LANGUAGE_CODE = 'en'
+
+gettext = lambda s: s
+LANGUAGES = (
+    ('en', gettext('English')),
+    ('th', gettext('Thai')),
+)
+
+LOCALE_PATHS = (
+    os.path.join(BASE_PATH, 'locale'),
+)
+
+SITE_ID = 1
+
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
+
+
 
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale.
@@ -81,8 +98,9 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -96,10 +114,10 @@ MIDDLEWARE_CLASSES = (
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.debug',
+    'django.core.context_processors.request',
     'django.core.context_processors.i18n',
     'django.core.context_processors.media',
     'django.core.context_processors.static',
-    'django.core.context_processors.tz',
     
     'mixkey.context_processors.site_information',
 )

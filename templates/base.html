@@ -1,8 +1,12 @@
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+{% get_available_languages as LANGUAGES %}
+{% get_language_info for LANGUAGE_CODE as lang %}
 <!doctype html>
 <html>
   <head>
     <meta charset="utf-8">
-    <title>TELEMETRY STATION</title>
+    <title>{% trans 'TELEMETRY STATION' %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <link rel="stylesheet" href="{{ STATIC_URL }}libs/bootstrap/css/bootstrap.min.css">
@@ -39,38 +43,38 @@
         });
       });
     </script>
+    <style>
+      {% for code, title in LANGUAGES %}
+      .lang-{{ code }} {
+        display: inline-block;
+        width: 20px;
+        background: url("{{ STATIC_URL }}css/img/icon-flag-{{ code }}.png") no-repeat 0 4px;
+        text-indent: -9999px;
+      }
+      {% endfor %}
+    </style>
     {% block js %}{% endblock %}
     
   </head>
   <body>
-    
-
     
     <!-- Fixed navbar -->
     <div class="navbar navbar-default navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
 
-          {% if project_selected  %}
-          <a class="navbar-brand" href="{% url 'project_overview' project_selected.code.lower %}">TELEMETRY STATION</a>
-          {% else %}
-          <a class="navbar-brand" href="{% url 'home' %}">TELEMETRY STATION</a>
-          {% endif %}
+          <a class="navbar-brand" href="{% if project_selected  %}{% url 'project_overview' project_selected.code.lower %}{% else %}{% url 'home' %}{% endif %}">{% trans 'TELEMETRY STATION' %}</a>
           
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li class="active">
               
-              {% if project_selected  %}
-              <a href="{% url 'project_overview' project_selected.code.lower %}">Home</a>
-              {% else %}
-              <a href="{% url 'home' %}">Home</a>
-              {% endif %}
+              <a href="{% if project_selected  %}{% url 'project_overview' project_selected.code.lower %}{% else %}{% url 'home' %}{% endif %}">{% trans 'Home' %}</a>              
               
             </li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li><a href="#about">{% trans 'About' %}</a></li>
+            <li><a href="#contact">{% trans 'Contact' %}</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
@@ -78,14 +82,14 @@
               {% if project_selected  %}
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ project_selected.get_name }} <b class="caret"></b></a>
               {% else %}
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">All projects <b class="caret"></b></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'All projects' %} <b class="caret"></b></a>
               {% endif %}
               
               <ul class="dropdown-menu select-project">
 
-                <li><a href="{% url 'home' %}all/">All projects</a></li>                
+                <li><a href="{% url 'home' %}all/">{% trans 'All projects' %}</a></li>                
                 <li class="divider"></li>
-                <li class="dropdown-header">Select Project</li>
+                <li class="dropdown-header">{% trans 'Select Project' %}</li>
                                 
                 {% for project in global_project_list %}
                 <li{% if project == project_selected %} class="active"{% endif %}>
@@ -96,16 +100,26 @@
               </ul>
             </li>
             
-            <!--
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">SI Units <b class="caret"></b></a>
-              <ul class="dropdown-menu select-unit">
-                <li class="dropdown-header">Select Measurement Unit</li>
-                <li><a href="#">SI Units</a></li>
-                <li><a href="#">Imperial Units</a></li>
+
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <span class="lang-{{ LANGUAGE_CODE }}">{{ lang.name_local }}</span>
+                <b class="caret"></b>
+              </a>
+              
+              <ul class="dropdown-menu select-language">
+                {% for code, title in LANGUAGES %}
+                  
+  					    <li{% if LANGUAGE_CODE == code %} class="active"{% endif %}>
+  					      <a href="{% url 'set_lang' %}?lang={{ code }}&next={{ request.path }}" title="{{ title }}">
+  					        <span class="lang-{{ code }}" >{{ title }}</span>
+  					      </a>
+  					    </li> 
+                {% endfor %}  
+                
               </ul>
             </li>
-            -->
+
           </ul>
         </div><!--/.nav-collapse -->
       </div>

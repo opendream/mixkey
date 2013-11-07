@@ -1,0 +1,186 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-11-07 17:38+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: domain/views.py:23
+msgid "Water Level (cm.)"
+msgstr "ระดับน้ำ MSL (ซม.)"
+
+#: domain/views.py:24 templates/overview.html:218
+#: templates/overview.html.py:306
+msgid "Temperature (&#8451;)"
+msgstr "อุณหภูมิ (&#8451;)"
+
+#: domain/views.py:25
+msgid "Humidity (%)"
+msgstr "ความชื้น (%)"
+
+#: domain/views.py:26 templates/overview.html:220
+#: templates/overview.html.py:308
+msgid "Raingauge (mm.)"
+msgstr "น้ำฝน (มม.)"
+
+#: domain/views.py:27 templates/overview.html:221
+msgid "Battery (V)"
+msgstr "แบตเตอรี่ (โวต์)"
+
+#: domain/views.py:174
+msgid "Date"
+msgstr "วัน เวลา"
+
+#: domain/views.py:176
+msgid "Lost Signal"
+msgstr "สัญญาณขาดหาย"
+
+#: domain/views.py:183
+msgid "Red Level"
+msgstr "ระดับ สีแดง"
+
+#: domain/views.py:189
+msgid "Yellow Level"
+msgstr "ระดับ สีเหลือง"
+
+#: mixkey/settings.py:48
+msgid "English"
+msgstr "อังกฤษ"
+
+#: mixkey/settings.py:49
+msgid "Thai"
+msgstr "ไทย"
+
+#: templates/base.html:9 templates/base.html.py:66
+msgid "TELEMETRY STATION"
+msgstr "สถานีตรวจวัด"
+
+#: templates/base.html:73
+msgid "Home"
+msgstr "หน้าแรก"
+
+#: templates/base.html:76
+msgid "About"
+msgstr "เกี่ยวกับเรา"
+
+#: templates/base.html:77
+msgid "Contact"
+msgstr "ติดต่อเรา"
+
+#: templates/base.html:85 templates/base.html.py:90
+msgid "All projects"
+msgstr "ทุกโครงการ"
+
+#: templates/base.html:92
+msgid "Select Project"
+msgstr "เลือกโครงการ"
+
+#: templates/overview.html:172 templates/overview.html.py:203
+#: templates/overview.html:303
+msgid "Sensor"
+msgstr "เครื่องตรวจวัด"
+
+#: templates/overview.html:174
+msgid "Latest Update"
+msgstr "สถานะล่าสุด"
+
+#: templates/overview.html:176
+msgid "All Projects"
+msgstr "ทุกโครงการ"
+
+#: templates/overview.html:181
+msgid "Location"
+msgstr "สถานที่"
+
+#: templates/overview.html:189
+msgid "Active to this project"
+msgstr "เลือกเป็นโครงการที่ติดตาม"
+
+#: templates/overview.html:210
+msgid "Water Level MSL"
+msgstr "ระดับน้ำ MSL"
+
+#: templates/overview.html:211
+msgid "cm."
+msgstr "ซม."
+
+#: templates/overview.html:222 templates/overview.html.py:309
+msgid "Date Time"
+msgstr "วัน เวลา"
+
+#: templates/overview.html:249
+msgid "Graph"
+msgstr "กราฟ"
+
+#: templates/overview.html:262
+msgid "Select report"
+msgstr "เลือกรายงาน"
+
+#: templates/overview.html:293
+msgid "Real-time Data"
+msgstr "ข้อมูล ณ เวลาจริง"
+
+#: templates/overview.html:300
+msgid "Project"
+msgstr "โครงการ"
+
+#: templates/overview.html:305
+msgid "Water Level MSL (cm.)"
+msgstr "ระดับน้ำ MSL (ซม.)"
+
+#: templates/overview.html:310
+msgid "Code"
+msgstr "รหัส"
+
+msgid "utrasonic"
+msgstr "ระดับน้ำ"
+
+msgid "temperature"
+msgstr "อุณหภูมิ"
+
+msgid "humidity"
+msgstr "ความชื้น"
+
+msgid "raingauge"
+msgstr "น้ำฝน"
+
+msgid "battery"
+msgstr "แบตเตอรี่"
+
+msgid "Every years"
+msgstr "รายปี"
+
+msgid "Every months"
+msgstr "รายเดือน"
+
+msgid "Every weeks"
+msgstr "รายสัปดาห์"
+
+msgid "Every days"
+msgstr "รายวัน"
+
+msgid "Every hours"
+msgstr "รายชั่วโมง"
+
+msgid "Every thirty minutes"
+msgstr "ราย 30 นาที"
+
+msgid "Every ten minutes"
+msgstr "ราย 10 นาที"
+
+msgid "Every one minutes"
+msgstr "ราย 1 นาที"
+

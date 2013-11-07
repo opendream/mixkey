@@ -4,11 +4,18 @@ from domain.models import *
 admin.site.register(Project)
 admin.site.register(Sensor)
 admin.site.register(SMSLog)
-admin.site.register(Data)
-admin.site.register(DataTenMinute)
-admin.site.register(DataThirtyMinute)
-admin.site.register(DataHour)
-admin.site.register(DataDay)
-admin.site.register(DataWeek)
-admin.site.register(DataYear)
+
+
+class DataAdmin(admin.ModelAdmin):
+    list_display = ('created', 'get_water_level', 'get_water_level_raw', 'utrasonic', 'temperature', 'humidity', 'raingauge', 'battery')
+    list_filter = ('sensor', 'created', )
+    actions = None
+
+admin.site.register(Data, DataAdmin)
+admin.site.register(DataTenMinute, DataAdmin)
+admin.site.register(DataThirtyMinute, DataAdmin)
+admin.site.register(DataHour, DataAdmin)
+admin.site.register(DataDay, DataAdmin)
+admin.site.register(DataWeek, DataAdmin)
+admin.site.register(DataYear, DataAdmin)
 

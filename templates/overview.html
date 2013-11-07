@@ -31,7 +31,7 @@ function drawVisualization(elm, data, title) {
   var options = {
     title : title,
     vAxis: {title: label_v, minValue: null},
-    hAxis: {title: label_h, minValue: new Date()},
+    hAxis: {title: label_h, minValue: new Date(), format: 'yyyy/MM/dd'},
     seriesType: "line",
     series: {
       0: {type: "area", color: '#3a87ad'}, 
@@ -178,9 +178,22 @@ google.maps.event.addDomListener(window, 'load', initialize);
   {% endif %}
 </h1>
 
+
 {% if sensor_selected and sensor_selected.lat and sensor_selected.lng %}
-<h2 class="project-title">{% trans 'Location' %}</h2>
+<h2 class="project-title"><span class="glyphicon glyphicon-map-marker"></span> {% trans 'Location' %}</h2>
 <div id="map-canvas"></div>
+{% endif %}
+
+
+{% if sensor_selected and user.is_authenticated %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{% trans 'Description' %}</h3>
+  </div>
+  <div class="panel-body">
+    {{ sensor_selected.description }}
+  </div>
+</div>
 {% endif %}
 
 
@@ -199,7 +212,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
       <div class="panel-heading">
         <h3 class="panel-title">
           {% if sensor_selected %}
-          Sensor - {{ sensor.get_name }}
+          {% trans 'Sensor' %} - {{ sensor.get_name }}
           {% else %}
           <a href="{% url 'sensor_overview' sensor.project.code.lower sensor.code.lower %}">{% trans 'Sensor' %} - {{ sensor.get_name }}</a>
           {% endif %}

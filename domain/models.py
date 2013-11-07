@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 from domain.functions import median
 
@@ -98,7 +99,8 @@ class Sensor(models.Model):
         
     def get_name(self):
         return self.name or self.code
-        
+    
+    @property    
     def get_category(self):
         
         water_level = 0
@@ -156,7 +158,7 @@ class BaseData(models.Model):
         return median(water_level_list)
     
 
-            
+    @property        
     def get_category(self):
         
         sensor = self.sensor
@@ -168,7 +170,7 @@ class BaseData(models.Model):
             return 'YELLOW'
 
         return 'GREEN' 
-    
+    @property
     def get_local_created(self):
         return self.created + timedelta(hours=self.sensor.project.timezone)
 

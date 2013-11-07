@@ -184,3 +184,5 @@ msgstr "ราย 10 นาที"
 msgid "Every one minutes"
 msgstr "ราย 1 นาที"
 
+msgid "Description"
+msgstr "รายละเอียด"

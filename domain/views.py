@@ -168,7 +168,6 @@ def data_summary(sensor, op='DataDay', field_name='utrasonic'):
             data_list.append([(lost.created - timedelta(minutes=30)).strftime("new Date(%Y, %m-1, %d, %H+" + str(timezone) + ", %M)"), value, None])
                     
         data_list.append(data)
-        
     
     cols = [
         {'id': 'date', 'label': _('Date'), 'type': 'datetime'},

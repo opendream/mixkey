@@ -108,6 +108,7 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
     'domain.middleware.ProjectMiddleware',
+    'domain.middleware.ForceInEnglish',
     
 )
 

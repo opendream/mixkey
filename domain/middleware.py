@@ -1,6 +1,17 @@
 from django.shortcuts import redirect
+from django.utils.translation import activate     
+from django.conf import settings
 
 from domain.models import Project
+
+import re
+
+class ForceInEnglish(object):
+
+    def process_request(self, request):   
+        if re.match(".*admin/", request.path):          
+            activate("en")      
+            
 
 class ProjectMiddleware(object):
     
@@ -58,3 +69,4 @@ class ProjectMiddleware(object):
             response.set_cookie('project_selected', self.project_selected.code.lower())            
 
         return response
+        

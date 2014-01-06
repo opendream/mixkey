@@ -17,6 +17,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     
     url(r'^$', 'domain.views.home', name='home'),
+    url(r'^api/', include('api.urls')),
     url(r'^c/$', 'domain.views.data_create', name='data_create'),
     
     

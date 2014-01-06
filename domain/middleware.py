@@ -21,7 +21,7 @@ class ProjectMiddleware(object):
     def process_view(self, request, view_func, view_args, view_kwargs):
         
         # ignore case
-        if request.path.split('/')[1] in ['c', 'admin', 'language']:
+        if request.path.split('/')[1] in ['api', 'c', 'admin', 'language']:
             return None
         
         project_code = view_kwargs.get('project_code') or ''

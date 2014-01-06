@@ -1,0 +1,185 @@
+###################################################################################################################
+# MixKey API test shell script
+# !! replace "localhost:8000" with "mixkey-data.opendreamlabs.com" !!
+# You can see all of API request below.
+###################################################################################################################
+
+
+###################################################################################################################
+# project
+###################################################################################################################
+
+# ++ detail
+curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/project/4/"
+
+# ++ list
+curl --dump-header -H "http://localhost:8000/api/project/"
+
+# ++ list with params
+# @param code
+# @param order_by
+curl --dump-header -H "http://localhost:8000/api/goal/?code=MCH"
+curl --dump-header -H "http://localhost:8000/api/goal/?order_by=created"
+
+
+###################################################################################################################
+# sensor
+###################################################################################################################
+
+# ++ detail
+curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/sensor/7/"
+
+# ++ list
+curl --dump-header -H "http://localhost:8000/api/sensor/"
+
+# ++ list with params
+# @param code
+# @param project
+# @param order_by
+curl --dump-header -H "http://localhost:8000/api/sensor/?code=K1"
+curl --dump-header -H "http://localhost:8000/api/sensor/?project=4&order_by=created"
+
+
+###################################################################################################################
+# data
+###################################################################################################################
+
+# ++ detail
+curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/data/71048/"
+
+# ++ list
+curl --dump-header -H "http://localhost:8000/api/data/"
+
+# ++ list with params
+# @param project
+# @param sensor
+# @param order_by
+curl --dump-header -H "http://localhost:8000/api/data/?project=4&order_by=created"
+curl --dump-header -H "http://localhost:8000/api/data/?sensor=7&order_by=created"
+
+
+###################################################################################################################
+# data_ten_minute
+###################################################################################################################
+
+# ++ detail
+curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/data_ten_minute/71048/"
+
+# ++ list
+curl --dump-header -H "http://localhost:8000/api/data_ten_minute/"
+
+# ++ list with params
+# @param project
+# @param sensor
+# @param order_by
+curl --dump-header -H "http://localhost:8000/api/data_ten_minute/?project=4&order_by=created"
+curl --dump-header -H "http://localhost:8000/api/data_ten_minute/?sensor=7&order_by=created"
+
+
+###################################################################################################################
+# data_thirty_minute
+###################################################################################################################
+
+# ++ detail
+curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/data_thirty_minute/71048/"
+
+# ++ list
+curl --dump-header -H "http://localhost:8000/api/data_thirty_minute/"
+
+# ++ list with params
+# @param project
+# @param sensor
+# @param order_by
+curl --dump-header -H "http://localhost:8000/api/data_thirty_minute/?project=4&order_by=created"
+curl --dump-header -H "http://localhost:8000/api/data_thirty_minute/?sensor=7&order_by=created"
+
+
+###################################################################################################################
+# data_hour
+###################################################################################################################
+
+# ++ detail
+curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/data_hour/71048/"
+
+# ++ list
+curl --dump-header -H "http://localhost:8000/api/data_hour/"
+
+# ++ list with params
+# @param project
+# @param sensor
+# @param order_by
+curl --dump-header -H "http://localhost:8000/api/data_hour/?project=4&order_by=created"
+curl --dump-header -H "http://localhost:8000/api/data_hour/?sensor=7&order_by=created"
+
+
+###################################################################################################################
+# data_day
+###################################################################################################################
+
+# ++ detail
+curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/data_day/71048/"
+
+# ++ list
+curl --dump-header -H "http://localhost:8000/api/data_day/"
+
+# ++ list with params
+# @param project
+# @param sensor
+# @param order_by
+curl --dump-header -H "http://localhost:8000/api/data_day/?project=4&order_by=created"
+curl --dump-header -H "http://localhost:8000/api/data_day/?sensor=7&order_by=created"
+
+
+###################################################################################################################
+# data_week
+###################################################################################################################
+
+# ++ detail
+curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/data_week/71048/"
+
+# ++ list
+curl --dump-header -H "http://localhost:8000/api/data_week/"
+
+# ++ list with params
+# @param project
+# @param sensor
+# @param order_by
+curl --dump-header -H "http://localhost:8000/api/data_week/?project=4&order_by=created"
+curl --dump-header -H "http://localhost:8000/api/data_week/?sensor=7&order_by=created"
+
+
+###################################################################################################################
+# data_month
+###################################################################################################################
+
+# ++ detail
+curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/data_month/71048/"
+
+# ++ list
+curl --dump-header -H "http://localhost:8000/api/data_month/"
+
+# ++ list with params
+# @param project
+# @param sensor
+# @param order_by
+curl --dump-header -H "http://localhost:8000/api/data_month/?project=4&order_by=created"
+curl --dump-header -H "http://localhost:8000/api/data_month/?sensor=7&order_by=created"
+
+
+###################################################################################################################
+# data_year
+###################################################################################################################
+
+# ++ detail
+curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/data_year/71048/"
+
+# ++ list
+curl --dump-header -H "http://localhost:8000/api/data_year/"
+
+# ++ list with params
+# @param project
+# @param sensor
+# @param order_by
+curl --dump-header -H "http://localhost:8000/api/data_year/?project=4&order_by=created"
+curl --dump-header -H "http://localhost:8000/api/data_year/?sensor=7&order_by=created"
+

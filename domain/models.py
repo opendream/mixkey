@@ -175,7 +175,7 @@ class BaseData(models.Model):
         return self.created + timedelta(hours=self.sensor.project.timezone)
 
     def __unicode__(self):
-        return 'Sensor: %s at %s' % (self.sensor.get_name(), self.get_local_created().strftime("%Y-%m-%d %H:%M:%S"))
+        return 'Sensor: %s at %s' % (self.sensor.get_name(), self.get_local_created.strftime("%Y-%m-%d %H:%M:%S"))
         
     def save(self, *args, **kwargs):
         super(BaseData, self).save(*args, **kwargs)
@@ -212,11 +212,12 @@ class SMSLog(models.Model):
     
     message_sid = models.TextField(null=True, blank=True) # stroe recived message sisd from service
     
+    @property
     def get_local_created(self):
         return self.created + timedelta(hours=self.project.timezone)
     
     def __unicode__(self):
-        return '[%s] %s at %s' % (self.get_category_display(), self.project.get_name(), self.get_local_created().strftime("%Y-%m-%d %H:%M:%S"))
+        return '[%s] %s at %s' % (self.get_category_display(), self.project.get_name(), self.get_local_created.strftime("%Y-%m-%d %H:%M:%S"))
     
 class Data(BaseData):
     pass

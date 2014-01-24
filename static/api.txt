@@ -1,7 +1,8 @@
 ###################################################################################################################
-# MixKey API test shell script
-# !! replace "localhost:8000" with "mixkey-data.opendreamlabs.com" !!
+# MixKey API test shell script.
+# Return JSON format.
 # You can see all of API request below.
+# You can add param at the end of url for open on browser with "&format=json"
 ###################################################################################################################
 
 
@@ -10,16 +11,16 @@
 ###################################################################################################################
 
 # ++ detail
-curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/project/4/"
+curl --dump-header -H "Content-Type: application/json" -X GET "http://mixkey-data.opendreamlabs.com/api/project/4/"
 
 # ++ list
-curl --dump-header -H "http://localhost:8000/api/project/"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/project/"
 
 # ++ list with params
 # @param code
 # @param order_by
-curl --dump-header -H "http://localhost:8000/api/goal/?code=MCH"
-curl --dump-header -H "http://localhost:8000/api/goal/?order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/project/?code=MCH"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/project/?order_by=created"
 
 
 ###################################################################################################################
@@ -27,17 +28,17 @@ curl --dump-header -H "http://localhost:8000/api/goal/?order_by=created"
 ###################################################################################################################
 
 # ++ detail
-curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/sensor/7/"
+curl --dump-header -H "Content-Type: application/json" -X GET "http://mixkey-data.opendreamlabs.com/api/sensor/7/"
 
 # ++ list
-curl --dump-header -H "http://localhost:8000/api/sensor/"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/sensor/"
 
 # ++ list with params
 # @param code
 # @param project
 # @param order_by
-curl --dump-header -H "http://localhost:8000/api/sensor/?code=K1"
-curl --dump-header -H "http://localhost:8000/api/sensor/?project=4&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/sensor/?code=K1"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/sensor/?project=4&order_by=created"
 
 
 ###################################################################################################################
@@ -45,17 +46,17 @@ curl --dump-header -H "http://localhost:8000/api/sensor/?project=4&order_by=crea
 ###################################################################################################################
 
 # ++ detail
-curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/data/71048/"
+curl --dump-header -H "Content-Type: application/json" -X GET "http://mixkey-data.opendreamlabs.com/api/data/71048/"
 
 # ++ list
-curl --dump-header -H "http://localhost:8000/api/data/"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data/"
 
 # ++ list with params
 # @param project
 # @param sensor
 # @param order_by
-curl --dump-header -H "http://localhost:8000/api/data/?project=4&order_by=created"
-curl --dump-header -H "http://localhost:8000/api/data/?sensor=7&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data/?project=4&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data/?sensor=7&order_by=created"
 
 
 ###################################################################################################################
@@ -63,17 +64,17 @@ curl --dump-header -H "http://localhost:8000/api/data/?sensor=7&order_by=created
 ###################################################################################################################
 
 # ++ detail
-curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/data_ten_minute/71048/"
+curl --dump-header -H "Content-Type: application/json" -X GET "http://mixkey-data.opendreamlabs.com/api/data_ten_minute/71048/"
 
 # ++ list
-curl --dump-header -H "http://localhost:8000/api/data_ten_minute/"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_ten_minute/"
 
 # ++ list with params
 # @param project
 # @param sensor
 # @param order_by
-curl --dump-header -H "http://localhost:8000/api/data_ten_minute/?project=4&order_by=created"
-curl --dump-header -H "http://localhost:8000/api/data_ten_minute/?sensor=7&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_ten_minute/?project=4&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_ten_minute/?sensor=7&order_by=created"
 
 
 ###################################################################################################################
@@ -81,17 +82,17 @@ curl --dump-header -H "http://localhost:8000/api/data_ten_minute/?sensor=7&order
 ###################################################################################################################
 
 # ++ detail
-curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/data_thirty_minute/71048/"
+curl --dump-header -H "Content-Type: application/json" -X GET "http://mixkey-data.opendreamlabs.com/api/data_thirty_minute/71048/"
 
 # ++ list
-curl --dump-header -H "http://localhost:8000/api/data_thirty_minute/"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_thirty_minute/"
 
 # ++ list with params
 # @param project
 # @param sensor
 # @param order_by
-curl --dump-header -H "http://localhost:8000/api/data_thirty_minute/?project=4&order_by=created"
-curl --dump-header -H "http://localhost:8000/api/data_thirty_minute/?sensor=7&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_thirty_minute/?project=4&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_thirty_minute/?sensor=7&order_by=created"
 
 
 ###################################################################################################################
@@ -99,17 +100,17 @@ curl --dump-header -H "http://localhost:8000/api/data_thirty_minute/?sensor=7&or
 ###################################################################################################################
 
 # ++ detail
-curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/data_hour/71048/"
+curl --dump-header -H "Content-Type: application/json" -X GET "http://mixkey-data.opendreamlabs.com/api/data_hour/71048/"
 
 # ++ list
-curl --dump-header -H "http://localhost:8000/api/data_hour/"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_hour/"
 
 # ++ list with params
 # @param project
 # @param sensor
 # @param order_by
-curl --dump-header -H "http://localhost:8000/api/data_hour/?project=4&order_by=created"
-curl --dump-header -H "http://localhost:8000/api/data_hour/?sensor=7&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_hour/?project=4&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_hour/?sensor=7&order_by=created"
 
 
 ###################################################################################################################
@@ -117,17 +118,17 @@ curl --dump-header -H "http://localhost:8000/api/data_hour/?sensor=7&order_by=cr
 ###################################################################################################################
 
 # ++ detail
-curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/data_day/71048/"
+curl --dump-header -H "Content-Type: application/json" -X GET "http://mixkey-data.opendreamlabs.com/api/data_day/71048/"
 
 # ++ list
-curl --dump-header -H "http://localhost:8000/api/data_day/"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_day/"
 
 # ++ list with params
 # @param project
 # @param sensor
 # @param order_by
-curl --dump-header -H "http://localhost:8000/api/data_day/?project=4&order_by=created"
-curl --dump-header -H "http://localhost:8000/api/data_day/?sensor=7&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_day/?project=4&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_day/?sensor=7&order_by=created"
 
 
 ###################################################################################################################
@@ -135,17 +136,17 @@ curl --dump-header -H "http://localhost:8000/api/data_day/?sensor=7&order_by=cre
 ###################################################################################################################
 
 # ++ detail
-curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/data_week/71048/"
+curl --dump-header -H "Content-Type: application/json" -X GET "http://mixkey-data.opendreamlabs.com/api/data_week/71048/"
 
 # ++ list
-curl --dump-header -H "http://localhost:8000/api/data_week/"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_week/"
 
 # ++ list with params
 # @param project
 # @param sensor
 # @param order_by
-curl --dump-header -H "http://localhost:8000/api/data_week/?project=4&order_by=created"
-curl --dump-header -H "http://localhost:8000/api/data_week/?sensor=7&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_week/?project=4&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_week/?sensor=7&order_by=created"
 
 
 ###################################################################################################################
@@ -153,17 +154,17 @@ curl --dump-header -H "http://localhost:8000/api/data_week/?sensor=7&order_by=cr
 ###################################################################################################################
 
 # ++ detail
-curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/data_month/71048/"
+curl --dump-header -H "Content-Type: application/json" -X GET "http://mixkey-data.opendreamlabs.com/api/data_month/71048/"
 
 # ++ list
-curl --dump-header -H "http://localhost:8000/api/data_month/"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_month/"
 
 # ++ list with params
 # @param project
 # @param sensor
 # @param order_by
-curl --dump-header -H "http://localhost:8000/api/data_month/?project=4&order_by=created"
-curl --dump-header -H "http://localhost:8000/api/data_month/?sensor=7&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_month/?project=4&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_month/?sensor=7&order_by=created"
 
 
 ###################################################################################################################
@@ -171,15 +172,15 @@ curl --dump-header -H "http://localhost:8000/api/data_month/?sensor=7&order_by=c
 ###################################################################################################################
 
 # ++ detail
-curl --dump-header -H "Content-Type: application/json" -X GET "http://localhost:8000/api/data_year/71048/"
+curl --dump-header -H "Content-Type: application/json" -X GET "http://mixkey-data.opendreamlabs.com/api/data_year/71048/"
 
 # ++ list
-curl --dump-header -H "http://localhost:8000/api/data_year/"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_year/"
 
 # ++ list with params
 # @param project
 # @param sensor
 # @param order_by
-curl --dump-header -H "http://localhost:8000/api/data_year/?project=4&order_by=created"
-curl --dump-header -H "http://localhost:8000/api/data_year/?sensor=7&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_year/?project=4&order_by=created"
+curl --dump-header -H "http://mixkey-data.opendreamlabs.com/api/data_year/?sensor=7&order_by=created"
 

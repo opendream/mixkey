@@ -10,8 +10,13 @@ class ForceInEnglish(object):
 
     def process_request(self, request):   
         if re.match(".*admin/", request.path):          
-            activate("en")      
-            
+            activate("en")
+        elif re.match(".*api/", request.path):
+            if request.GET.get('language'):
+                activate(request.GET.get('language'))
+            else:
+                activate('th')
+                
 
 class ProjectMiddleware(object):
     

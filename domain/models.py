@@ -157,6 +157,21 @@ class BaseData(models.Model):
         water_level_list = [d.get_water_level_raw for d in data_list]
         return median(water_level_list)
     
+    @property    
+    def get_difference_status(self):
+                
+        prev_data = self.sensor.data_set.filter(created__lte=self.created).latest('created')
+        prev_water_level_raw = prev_data.get_water_level_raw
+        
+        water_level_raw = self.get_water_level_raw
+        
+        status = 'eq'
+        if water_level_raw > prev_water_level_raw + 5:
+            status = 'up'
+        elif water_level_raw < prev_water_level_raw - 5:
+            status = 'down'
+        
+        return status
 
     @property        
     def get_category(self):

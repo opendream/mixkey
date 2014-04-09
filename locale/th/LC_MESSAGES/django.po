@@ -186,3 +186,6 @@ msgstr "ราย 1 นาที"
 
 msgid "Description"
 msgstr "รายละเอียด"
+
+msgid "date"
+msgstr "วัน เวลา"

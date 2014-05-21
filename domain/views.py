@@ -218,6 +218,9 @@ def data_create(request):
     if not sensor:
         return HttpResponseNotFound('Error: Sensor must be required (M or S)')
         
+    # Hot fix swap K2 and K3
+    sensor = {'K2': 'K3', 'K3': 'K2'}[sensor] if sensor in ('K2', 'K3') else sensor
+    
     try:
         sensor = Sensor.objects.get(code=sensor)
     except:

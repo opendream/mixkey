@@ -145,7 +145,7 @@ class BaseData(models.Model):
         else:
             water_level = self.utrasonic
         
-        return water_level
+        return max(0, water_level)
         
     @property    
     def get_water_level(self):
@@ -155,7 +155,7 @@ class BaseData(models.Model):
     
         data_list = self.sensor.data_set.filter(created__lte=self.created).order_by('-created')[0:10]
         water_level_list = [d.get_water_level_raw for d in data_list]
-        return median(water_level_list)
+        return max(0, median(water_level_list))
     
     @property    
     def get_difference_status(self):

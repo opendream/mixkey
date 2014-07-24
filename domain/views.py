@@ -151,7 +151,7 @@ def data_summary(sensor, op='DataDay', field_name='utrasonic'):
         
         if field_name == 'utrasonic' and value is not None and sensor.formula:
             x = value
-            value = eval(sensor.formula)
+            value = max(0, eval(sensor.formula))
             
         #elif field_name == 'battery' and value is not None:
         #    value = float(12.5-value)/float(12.5-10.5)*100
@@ -191,7 +191,21 @@ def data_summary(sensor, op='DataDay', field_name='utrasonic'):
             data_list = zip(*data_list)
             data_list.append([sensor.level_yellow]*length)
             data_list = zip(*data_list)
-            
+   
+    elif field_name == 'battery':
+        length = len(data_list)
+
+        cols.append({'id': 'red', 'label': _('Red Level'), 'type': 'number'})
+        data_list = zip(*data_list)
+        data_list.append([settings.BATTERY_RED_LEVEL]*length)
+        data_list = zip(*data_list)
+
+        cols.append({'id': 'yellow', 'label': _('Yellow Level'), 'type': 'number'})
+        data_list = zip(*data_list)
+        data_list.append([settings.BATTERY_YELLOW_LEVEL]*length)
+        data_list = zip(*data_list)
+      
+      
     # Prepare data to js    
     result = []
     for row in data_list:
@@ -252,8 +266,10 @@ def data_create(request):
     
     data = Data.objects.create(sensor = sensor, utrasonic = utrasonic, temperature = temperature, humidity = humidity, raingauge = raingauge, battery = battery, created=datetime.today())
     
+    resp = 'Data store completed: project: %s, sensor: %s, utrasonic: %s, temperature: %s, humidity: %s, raingauge: %s, battery: %s' % (project.code, sensor.code, utrasonic, temperature, humidity, raingauge, battery)
+    resp = '%s\r\n%s\r\n' % (resp, '{|Send Okay}')
     
-    return HttpResponse('Data store completed: project: %s, sensor: %s, utrasonic: %s, temperature: %s, humidity: %s, raingauge: %s, battery: %s' % (project.code, sensor.code, utrasonic, temperature, humidity, raingauge, battery))
+    return HttpResponse(resp)
     
 
 

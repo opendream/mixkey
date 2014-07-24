@@ -156,6 +156,16 @@ class BaseData(models.Model):
         data_list = self.sensor.data_set.filter(created__lte=self.created).order_by('-created')[0:10]
         water_level_list = [d.get_water_level_raw for d in data_list]
         return max(0, median(water_level_list))
+
+    @property    
+    def get_battery(self):
+            
+        # List of the data previous in 10 miniutes
+        time_prev_check = self.created-timedelta(minutes=settings.PREV_DATA_BUFFER_TIME)
+
+        data_list = self.sensor.data_set.filter(created__lte=self.created).order_by('-created')[0:10]
+        battery_list = [d.battery for d in data_list]
+        return max(0, median(battery_list))
     
     @property    
     def get_difference_status(self):
@@ -194,10 +204,10 @@ class BaseData(models.Model):
         
     def save(self, *args, **kwargs):
         super(BaseData, self).save(*args, **kwargs)
-        from domain.tasks import send_alert
+        from domain.tasks import send_alert, send_battery_alert
         #send_alert.delay(self.id)
-        send_alert(self.id)
-        
+        send_alert(self.id)        
+        send_battery_alert(self.id)
         
 class SMSLog(models.Model):
     
@@ -207,12 +217,19 @@ class SMSLog(models.Model):
     DAILY        = 4
     SENSOR_LOST  = 5
     
+    ALERT_BATTERY_RED    = 11
+    ALERT_BATTERY_YELLOW = 12
+    ALERT_BATTERY_GREEN  = 13
+    
     CATEGORY_CHOICES = (
         (ALERT_RED, 'RED'), 
         (ALERT_YELLOW, 'YELLOW'), 
         (ALERT_GREEN, 'GREEN'), 
         (DAILY, 'DAILY'),
-        (SENSOR_LOST, 'SENSOR LOST')
+        (SENSOR_LOST, 'SENSOR LOST'),
+        (ALERT_BATTERY_RED, 'BATTERY RED'),
+        (ALERT_BATTERY_YELLOW, 'BATTERY YELLOW'),
+        (ALERT_BATTERY_GREEN, 'BATTERY GREEN'),
     )
     
     project      = models.ForeignKey(Project) # Required

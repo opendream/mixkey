@@ -26,7 +26,7 @@ def send_sms(project, message_body, category, sensor=None, created=None, subject
     
     tel_list = ''
     if sensor:
-        if category in [SMSLog.ALERT_RED, SMSLog.ALERT_YELLOW, SMSLog.ALERT_GREEN]:
+        if category in [SMSLog.ALERT_RED, SMSLog.ALERT_YELLOW, SMSLog.ALERT_GREEN, SMSLog.ALERT_BATTERY_RED, SMSLog.ALERT_BATTERY_YELLOW, SMSLog.ALERT_BATTERY_GREEN]:
             tel_list = sensor.tel_list or ''
         elif category in [SMSLog.SENSOR_LOST]:
             tel_list = settings.DETECT_SENSOR_LOST_TEL_LIST or ''
@@ -115,12 +115,12 @@ def count_log_category(log_list, category):
             count = count + 1
     return count
     
-def alert_message(category, project, sensor, water_level_median):
+def alert_message(category, project, sensor, value, text='water level: %s cm.'):
     
     return '\n'.join([
         '[%s CODE] from telemetry station' % SMSLog(category=category).get_category_display(),
         'Project: %s -- report reference from MSL.' % project.get_name(),
-        'Sensor %s -- water level: %s cm.' % (sensor.get_name(), (water_level_median))     
+        ('Sensor %s -- ' + text) % (sensor.get_name(), value)     
     ])
     
     
@@ -133,7 +133,7 @@ def send_alert(data):
     
     sensor = data.sensor
     
-    if not sensor.project.tel_list:
+    if not sensor.project.tel_list and not sensor.tel_list:
         return False
     
     latest_sms = False
@@ -143,8 +143,7 @@ def send_alert(data):
             return False
     except IndexError:
         pass
-            
-    
+                
     project = data.sensor.project
     water_level_median = data.get_water_level
     
@@ -167,14 +166,64 @@ def send_alert(data):
             
     else:
         try:
-            latest_category = SMSLog.objects.filter(sensor=sensor).order_by('-created')[0].category
+            latest_category = SMSLog.objects.filter(sensor=sensor, category__in=[SMSLog.ALERT_RED, SMSLog.ALERT_YELLOW, SMSLog.ALERT_GREEN]).order_by('-created')[0].category
             
             if latest_category == SMSLog.ALERT_RED or latest_category == SMSLog.ALERT_YELLOW:
                 send_sms(project, alert_message(SMSLog.ALERT_GREEN, project, sensor, water_level_median), SMSLog.ALERT_GREEN, sensor, data.created)
         
         except IndexError:
             pass
+
+@task()
+def send_battery_alert(data):
+    
+    # In case task cant send obj to function
+    if type(data) == int or type(data) == long :
+        data = Data.objects.get(id=data)
+    
+    sensor = data.sensor
+    
+    
+    if not sensor.project.tel_list and not sensor.tel_list:
+        return False
+    latest_sms = False
+    try:
+        latest_sms = SMSLog.objects.filter(sensor=sensor).order_by('-created')[0]
+        if data.created < latest_sms.created + timedelta(minutes=settings.PREV_DATA_BUFFER_TIME):
+            return False
+    except IndexError:
+        pass
             
+    project = data.sensor.project
+    battery_median = data.get_battery
+      
+    # List of repeat sms send in same category
+    #time_prev_check_repeat = data.created-timedelta(minutes=settings.PREV_DATA_BUFFER_TIME*(settings.MAX_REPEAT_ALERT))
+    log_list = SMSLog.objects.filter(sensor=sensor).order_by('-created')
+  
+    alert_text = 'battery: %s V.'
+    
+    # Red code alert limit in 5 times
+    if battery_median <= settings.BATTERY_RED_LEVEL:
+        if count_log_category(log_list[0: settings.MAX_REPEAT_ALERT], SMSLog.ALERT_BATTERY_RED) < settings.MAX_REPEAT_ALERT:
+            send_sms(project, alert_message(SMSLog.ALERT_BATTERY_RED, project, sensor, battery_median, text=alert_text), SMSLog.ALERT_BATTERY_RED, sensor, data.created)
+            
+    # Yellow code alert limit in 5 times        
+    elif battery_median <= settings.BATTERY_YELLOW_LEVEL and battery_median > settings.BATTERY_RED_LEVEL:
+        if count_log_category(log_list[0: settings.MAX_REPEAT_ALERT], SMSLog.ALERT_BATTERY_YELLOW) < settings.MAX_REPEAT_ALERT:
+            send_sms(project, alert_message(SMSLog.ALERT_BATTERY_YELLOW, project, sensor, battery_median, text=alert_text), SMSLog.ALERT_BATTERY_YELLOW, sensor, data.created)
+            
+    else:
+        try:
+            latest_category = SMSLog.objects.filter(sensor=sensor, category__in=[SMSLog.ALERT_BATTERY_RED, SMSLog.ALERT_BATTERY_YELLOW, SMSLog.ALERT_BATTERY_GREEN]).order_by('-created')[0].category
+            
+            if latest_category == SMSLog.ALERT_BATTERY_RED or latest_category == SMSLog.ALERT_BATTERY_YELLOW:
+                send_sms(project, alert_message(SMSLog.ALERT_BATTERY_GREEN, project, sensor, battery_median, text=alert_text), SMSLog.ALERT_BATTERY_GREEN, sensor, data.created)
+        
+        except IndexError:
+            pass
+            
+                        
 @task()            
 def detect_sensor_lost():
     

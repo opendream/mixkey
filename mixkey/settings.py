@@ -100,7 +100,9 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -221,7 +223,7 @@ PREV_DATA_BUFFER_TIME = 10 # miniutes
 MAX_REPEAT_ALERT = 5
 
 DETECT_SENSOR_LOST_TIME = 30 # miniutes
-DETECT_SENSOR_LOST_TEL_LIST = '+66897070170|panudate@opendream.co.th,+66897753337|patipat@opendream.co.th,+66842226566|paskorn@eng.cmu.ac.th,+66804986837|supamit.jankoo@gmail.com'
+DETECT_SENSOR_LOST_TEL_LIST = '+66897070170|panudate@opendream.co.th,+66897753337|patipat@opendream.co.th,+66842226566|paskorn@eng.cmu.ac.th,+66804986837|zerox.lp@gmail.com'
 
 # Email Settings #######################################################################################################
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -231,6 +233,17 @@ EMAIL_SUBJECT_PREFIX = 'TELEMETRY STATION'
 EMAIL_DOMAIN_NAME = 'mixkey-data.opendreamlabs.com'
 
 EMAIL_ADDRESS_NO_REPLY = '%s <webmaster@%s>' % (EMAIL_SUBJECT_PREFIX, EMAIL_DOMAIN_NAME)
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'TIMEOUT': 60
+    },
+    'resources': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'TIMEOUT': 60
+    }
+}
 
 
 # Override Settings ###########################################################

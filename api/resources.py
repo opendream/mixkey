@@ -8,6 +8,7 @@ from tastypie import fields
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 from tastypie.authorization import DjangoAuthorization
 from tastypie.serializers import Serializer
+from tastypie.cache import SimpleCache
 
 from domain.models import Project, Sensor, Data, DataTenMinute, DataThirtyMinute, DataHour, DataDay, DataWeek, DataMonth, DataYear
 
@@ -154,6 +155,9 @@ class BaseDataResource(ModelResource):
     difference_status = fields.CharField(attribute='get_difference_status')
     created = fields.DateTimeField(attribute='created')
     local_created = fields.DateTimeField(attribute='get_local_created')    
+
+    class Meta:
+        cache = SimpleCache(timeout=30)
     
 
 

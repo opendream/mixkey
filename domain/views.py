@@ -8,6 +8,7 @@ from django.forms.models import model_to_dict
 from django.utils import translation
 from django.conf import settings
 from django.utils.translation import check_for_language, ugettext as _
+from django.views.decorators.cache import cache_control
 
 from domain.models import Project, Sensor, Data, DataTenMinute, DataThirtyMinute, DataHour, DataDay, DataWeek, DataMonth, DataYear, SMSLog
 from domain.functions import medfilt1, set_to_midnight
@@ -27,6 +28,7 @@ field_label_list ={
     'battery'    : 'Battery (V)'
 }
 
+@cache_control(no_cache=True)
 def home(request):
     # For mixkey create record
     if request.GET.get('M') or request.GET.get('m') or request.GET.get('S') or request.GET.get('s'):
@@ -201,6 +203,7 @@ def data_summary(sensor, op='DataDay', field_name='utrasonic'):
     return result
 
     
+@cache_control(no_cache=True)
 def data_create(request):
     
     # Prepare data

@@ -8,7 +8,6 @@ sitestatic/
 *.swp
 celerybeat-schedule
 *.pyc
-*.py[co]
 
 # Packages
 *.egg

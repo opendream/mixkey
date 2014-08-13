@@ -156,6 +156,7 @@ INSTALLED_APPS = (
     'kombu.transport.django',
     'djcelery',
     'djsupervisor',
+    'daterange_filter',
     
     # Project
     'domain',
@@ -219,7 +220,7 @@ TWILIO_ACCOUNT_SID = 'REPLACE ME'
 TWILIO_AUTH_TOKEN  = 'REPLACE ME'
 TWILIO_FROM_NUMBER = 'REPLACE ME'
 
-PREV_DATA_BUFFER_TIME = 10 # miniutes
+PREV_DATA_BUFFER_TIME = 20 # miniutes
 MAX_REPEAT_ALERT = 5
 
 DETECT_SENSOR_LOST_TIME = 30 # miniutes

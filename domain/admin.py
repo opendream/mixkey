@@ -1,9 +1,15 @@
 from django.contrib import admin
 from domain.models import *
 
+
 admin.site.register(Project)
 admin.site.register(Sensor)
-admin.site.register(SMSLog)
+
+class SMSLogAdmin(admin.ModelAdmin):
+    list_filter = ('project', 'sensor', 'category', )
+    list_display = ('project', 'sensor', 'category', 'created', )
+
+admin.site.register(SMSLog, SMSLogAdmin)
 
 
 class DataAdmin(admin.ModelAdmin):

@@ -153,7 +153,7 @@ class BaseData(models.Model):
         # List of the data previous in 10 miniutes
         time_prev_check = self.created-timedelta(minutes=settings.PREV_DATA_BUFFER_TIME)
     
-        data_list = self.sensor.data_set.filter(created__lte=self.created, created_gte=time_prev_check).order_by('-created')[0:10]
+        data_list = self.sensor.data_set.filter(created__lte=self.created, created__gte=time_prev_check).order_by('-created')[0:10]
         water_level_list = [d.get_water_level_raw for d in data_list]
         return max(0, median(water_level_list))
 
@@ -163,7 +163,7 @@ class BaseData(models.Model):
         # List of the data previous in 10 miniutes
         time_prev_check = self.created-timedelta(minutes=settings.PREV_DATA_BUFFER_TIME)
 
-        data_list = self.sensor.data_set.filter(created__lte=self.created, created_gte=time_prev_check).order_by('-created')[0:10]
+        data_list = self.sensor.data_set.filter(created__lte=self.created, created__gte=time_prev_check).order_by('-created')[0:10]
         battery_list = [d.battery for d in data_list]
         return max(0, median(battery_list))
     

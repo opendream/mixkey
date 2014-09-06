@@ -7,8 +7,7 @@ settings_local.py
 sitestatic/
 *.swp
 celerybeat-schedule
-
-*.py[co]
+*.pyc
 
 # Packages
 *.egg

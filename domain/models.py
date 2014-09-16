@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from django.core.cache import cache
 
 from domain.functions import median
 
@@ -149,24 +150,41 @@ class BaseData(models.Model):
         
     @property    
     def get_water_level(self):
-                
+
+        water_level = cache.get('data:%s:water_level' % self.id)
+        if water_level is not None:
+            return water_level
+
         # List of the data previous in 10 miniutes
         time_prev_check = self.created-timedelta(minutes=settings.PREV_DATA_BUFFER_TIME)
     
         data_list = self.sensor.data_set.filter(created__lte=self.created).order_by('-created')[0:10]
         water_level_list = [d.get_water_level_raw for d in data_list]
-        return max(0, median(water_level_list))
+        water_level = max(0, median(water_level_list))
+
+        cache.set('data:%s:water_level' % self.id, water_level)
+
+        return water_level
 
     @property    
     def get_battery(self):
+
+        battery = cache.get('data:%s:battery' % self.id)
+        if battery is not None:
+            return battery
             
         # List of the data previous in 10 miniutes
         time_prev_check = self.created-timedelta(minutes=settings.PREV_DATA_BUFFER_TIME)
 
         data_list = self.sensor.data_set.filter(created__lte=self.created).order_by('-created')[0:10]
         battery_list = [d.battery for d in data_list]
-        return max(0, median(battery_list))
-    
+        battery = max(0, median(battery_list))
+
+        cache.set('data:%s:battery' % self.id, battery)
+
+        return battery
+
+
     @property    
     def get_difference_status(self):
                 

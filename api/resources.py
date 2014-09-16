@@ -154,10 +154,7 @@ class BaseDataResource(ModelResource):
     water_level = fields.FloatField(attribute='get_water_level_raw')
     difference_status = fields.CharField(attribute='get_difference_status')
     created = fields.DateTimeField(attribute='created')
-    local_created = fields.DateTimeField(attribute='get_local_created')    
-
-    class Meta:
-        cache = SimpleCache(timeout=30)
+    local_created = fields.DateTimeField(attribute='get_local_created')
     
 
 
@@ -169,7 +166,9 @@ class DataResource(BaseDataResource):
         filtering = base_data_filtering
         ordering = base_data_ordering
         serializer = DataRSSSerializer()
-        
+
+        cache = SimpleCache(timeout=60*10)
+
             
 class DataTenMinuteResource(BaseDataResource):
     class Meta:
@@ -178,7 +177,9 @@ class DataTenMinuteResource(BaseDataResource):
         
         filtering = base_data_filtering
         ordering = base_data_ordering
-        
+
+        cache = SimpleCache(timeout=60*10)
+
 class DataThirtyMinuteResource(BaseDataResource):
     class Meta:
         queryset = DataThirtyMinute.objects.all().order_by('-created')
@@ -186,7 +187,9 @@ class DataThirtyMinuteResource(BaseDataResource):
         
         filtering = base_data_filtering
         ordering = base_data_ordering
-        
+
+        cache = SimpleCache(timeout=60*30)
+
 class DataHourResource(BaseDataResource):
     class Meta:
         queryset = DataHour.objects.all().order_by('-created')
@@ -194,6 +197,8 @@ class DataHourResource(BaseDataResource):
         
         filtering = base_data_filtering
         ordering = base_data_ordering
+
+        cache = SimpleCache(timeout=60*60)
         
 class DataDayResource(BaseDataResource):
     class Meta:
@@ -202,6 +207,8 @@ class DataDayResource(BaseDataResource):
         
         filtering = base_data_filtering
         ordering = base_data_ordering
+
+        cache = SimpleCache(timeout=60*60*24)
         
 class DataWeekResource(BaseDataResource):
     class Meta:
@@ -210,6 +217,8 @@ class DataWeekResource(BaseDataResource):
         
         filtering = base_data_filtering
         ordering = base_data_ordering
+
+        cache = SimpleCache(timeout=60*60*24*7)
         
 class DataMonthResource(BaseDataResource):
     class Meta:
@@ -218,6 +227,8 @@ class DataMonthResource(BaseDataResource):
         
         filtering = base_data_filtering
         ordering = base_data_ordering
+
+        cache = SimpleCache(timeout=60*60*24*30)
         
 class DataYearResource(BaseDataResource):
     class Meta:
@@ -226,4 +237,6 @@ class DataYearResource(BaseDataResource):
         
         filtering = base_data_filtering
         ordering = base_data_ordering
+
+        cache = SimpleCache(timeout=60*60*24*364)
         

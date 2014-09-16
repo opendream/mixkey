@@ -72,7 +72,9 @@ def project_overview(request, project_code=False, sensor_code=False):
     
     field_name = request.GET.get('field') or 'utrasonic'
     op = request.GET.get('range') or 'DataDay'
-    
+    created_from = request.GET.get('created_from') or ''
+    created_to = request.GET.get('created_to') or ''
+
     for project in project_query:
         
         sensor_list = []
@@ -118,6 +120,8 @@ def project_overview(request, project_code=False, sensor_code=False):
         'current_field': field_name,
         'current_op': op,
         'data_range_list': data_range_list,
+        'created_from': created_from,
+        'created_to': created_to,
     })
     
     

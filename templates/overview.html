@@ -70,6 +70,16 @@ google.setOnLoadCallback(function () {
 });
 
 
+jQuery.fn.datepicker.dates['th'] = {
+    days: ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์", "อาทิตย์"],
+    daysShort: ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส.", "อา."],
+    daysMin: ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส", "อา"],
+    months: ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤษจิกายน", "ธันวาคม"],
+    monthsShort: ["ม.ค.", "ก.พ.", "ม.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."],
+    today: "วันนี้",
+    clear: "ยกเลิก"
+};
+
 jQuery(document).ready(function () {
   jQuery('#graph-select a').click(function () {
     
@@ -80,6 +90,15 @@ jQuery(document).ready(function () {
       window.location = jQuery(this).attr('href');
     }
   });
+
+  jQuery('.datepicker').datepicker({
+    language: '{{ LANGUAGE_CODE }}',
+    format: 'dd-mm-yyyy',
+    todayHighlight: true,
+    autoclose: true
+  });
+
+
 });
 
 </script>
@@ -206,7 +225,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
   {% if project.description %}
   <p>{{ project.description }}</p>
   {% endif %}
-    
+
   {% for sensor, data in sensor_list  %}    
     <div class="panel panel-{{ data.get_category|category_to_class }} sensor-current">
       <div class="panel-heading">
@@ -256,6 +275,26 @@ google.maps.event.addDomListener(window, 'load', initialize);
   {% endfor %}
 {% endfor %}
 
+
+<div class="panel panel-default" id="date-filter">
+  <div class="panel-heading">
+    <h4>{% trans 'Date filter' %}</h4>
+  </div>
+  <div class="panel-body">
+    <form role="form" class="form-inline" method="get">
+      <div class="form-group">
+        <label class="sr-only" for="dpd1">{% trans 'From' %}</label>
+        <input name="from" value="{{ created_from }}" type="text" class="form-control datepicker" id="dpd1" placeholder="{% trans 'From' %}" />
+      </div>
+      <div class="form-group">
+        <label class="sr-only" for="dpd2">{% trans 'To' %}</label>
+        <input name="to" value="{{ created_to }}" type="text" class="form-control datepicker" id="dpd2" placeholder="{% trans 'To' %}" />
+      </div>
+      <button type="submit" class="btn btn-default">{% trans 'Submit' %}</button>
+    </form>
+  </div>
+</div>
+
 {% if project_selected %}
 
 <div class="panel panel-default" id="graph">
@@ -284,11 +323,12 @@ google.maps.event.addDomListener(window, 'load', initialize);
       </li>
     </ul>
   </div>
+
   <div class="panel-body" id="graph-render-list">
   
     {% for project, sensor_list in project_list %}
     {% for sensor, data in sensor_list  %}
-    
+
     <div id="sensor-chart-{{ sensor.id}}" style="height: 500px;">
       GRAPH HERE
     </div>

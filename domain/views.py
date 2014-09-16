@@ -49,14 +49,20 @@ def project_overview(request, project_code=False, sensor_code=False):
     else:
         project_query = Project.objects.all().order_by('-created')
         
-    
+    created__gte = request.GET.get('created__gte') or ''
+    created__lte = request.GET.get('created__lte') or ''
+
     sensor_selected = None
     
     # List all data list
     data_list = Data.objects.all().order_by('-created')
     if project_selected:
         data_list = data_list.filter(sensor__project=project_selected)
-        
+        if created__gte:
+            data_list = data_list.filter(created__gte=datetime.strptime(created__gte, "%d-%m-%Y"))
+        if created__lte:
+            data_list = data_list.filter(created__lte=datetime.strptime(created__lte, "%d-%m-%Y"))
+
         try:
             if sensor_code:
                 sensor_selected = Sensor.objects.get(project=project_selected, code=sensor_code)
@@ -72,8 +78,7 @@ def project_overview(request, project_code=False, sensor_code=False):
     
     field_name = request.GET.get('field') or 'utrasonic'
     op = request.GET.get('range') or 'DataDay'
-    created_from = request.GET.get('created_from') or ''
-    created_to = request.GET.get('created_to') or ''
+
 
     for project in project_query:
         
@@ -88,8 +93,13 @@ def project_overview(request, project_code=False, sensor_code=False):
                         
             data = False
             sensor_data_list = sensor.data_set.order_by('-created')
+
+            if created__gte:
+                sensor_data_list = sensor_data_list.filter(created__gte=datetime.strptime(created__gte, "%d-%m-%Y"))
+            if created__lte:
+                sensor_data_list = sensor_data_list.filter(created__lte=datetime.strptime(created__lte, "%d-%m-%Y"))
                         
-            sensor.data_summary = data_summary(sensor, op=op, field_name=field_name)
+            sensor.data_summary = data_summary(sensor, op=op, field_name=field_name, created__gte=created__gte, created__lte=created__lte)
             
             try:
                 data = sensor_data_list[0]
@@ -120,12 +130,12 @@ def project_overview(request, project_code=False, sensor_code=False):
         'current_field': field_name,
         'current_op': op,
         'data_range_list': data_range_list,
-        'created_from': created_from,
-        'created_to': created_to,
+        'created__gte': created__gte,
+        'created__lte': created__lte,
     })
     
     
-def data_summary(sensor, op='DataDay', field_name='utrasonic'):
+def data_summary(sensor, op='DataDay', field_name='utrasonic', created__gte='', created__lte=''):
     
     # Define
     field_name_list = [f.name for f in Data._meta.fields]
@@ -135,9 +145,18 @@ def data_summary(sensor, op='DataDay', field_name='utrasonic'):
     InstCache = eval(op)
     
     # prepare cache
-    cache_list = list(InstCache.objects.filter(sensor=sensor).order_by('-created')[0:500])
+    cache_list = InstCache.objects.filter(sensor=sensor)
+
+    if created__gte:
+        cache_list = cache_list.filter(created__gte=datetime.strptime(created__gte, "%d-%m-%Y"))
+    if created__lte:
+        cache_list = cache_list.filter(created__lte=datetime.strptime(created__lte, "%d-%m-%Y"))
+
+    cache_list = list(cache_list.order_by('-created')[0:500])
     cache_list.reverse()
-    cache_list.append(InstCache(sensor=sensor, created=datetime.today()))
+
+    if not created__lte:
+        cache_list.append(InstCache(sensor=sensor, created=datetime.today()))
     
     lost_list = []
     try:

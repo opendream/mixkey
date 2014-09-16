@@ -20,7 +20,7 @@ msgstr ""
 
 #: domain/views.py:23
 msgid "Water Level (cm.)"
-msgstr "ระดับน้ำ MSL (ซม.)"
+msgstr "ระดับน้ำ (ซม.)"
 
 #: domain/views.py:24 templates/overview.html:218
 #: templates/overview.html.py:306
@@ -111,7 +111,7 @@ msgstr "เลือกเป็นโครงการที่ติดตา
 
 #: templates/overview.html:210
 msgid "Water Level MSL"
-msgstr "ระดับน้ำ MSL"
+msgstr "ระดับน้ำ"
 
 #: templates/overview.html:211
 msgid "cm."
@@ -139,7 +139,7 @@ msgstr "โครงการ"
 
 #: templates/overview.html:305
 msgid "Water Level MSL (cm.)"
-msgstr "ระดับน้ำ MSL (ซม.)"
+msgstr "ระดับน้ำ (ซม.)"
 
 #: templates/overview.html:310
 msgid "Code"

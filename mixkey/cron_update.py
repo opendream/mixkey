@@ -18,5 +18,5 @@ inst_list = ['Data', 'DataTenMinute', 'DataThirtyMinute', 'DataHour', 'DataDay',
 
 for Inst in inst_list:
     Inst = eval(Inst)
-    for d in Inst.objects.filter(water_level_raw__isnull=True).order_by('-created')[0:100]:
+    for d in Inst.objects.filter(water_level_raw__isnull=True).order_by('-created')[0:10]:
         d.save()

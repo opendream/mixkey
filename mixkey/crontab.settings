@@ -1,3 +1,4 @@
 0 8 * * * /path/to/project/directory/mixkey/cron_daily.sh
 */30 * * * * /path/to/project/directory/mixkey/cron_detect_sensor_lost.sh
 */10 * * * * /path/to/project/directory/mixkey/cron_cache.sh
+*/30 * * * * /path/to/project/directory/mixkey/cron_update.sh

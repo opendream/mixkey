@@ -106,6 +106,10 @@ jQuery(document).ready(function () {
 
 });
 
+{% if time_range_error %}
+alert('{% trans 'CSV Export: You must be select "From" day and time range limit in 365 days. Please, contact administrator for longer time export' %}');
+{% endif %}
+
 </script>
 {% endif %}
 

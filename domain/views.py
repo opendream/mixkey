@@ -53,6 +53,8 @@ def project_overview(request, project_code=False, sensor_code=False):
         
     created__gte = request.GET.get('created__gte') or ''
     created__lte = request.GET.get('created__lte') or ''
+    created__gte_date = datetime.strptime(created__gte, "%d-%m-%Y")
+    created__lte_date = datetime.strptime(created__lte, "%d-%m-%Y")
 
     sensor_selected = None
     
@@ -61,9 +63,9 @@ def project_overview(request, project_code=False, sensor_code=False):
     if project_selected:
         data_list = data_list.filter(sensor__project=project_selected)
         if created__gte:
-            data_list = data_list.filter(created__gte=datetime.strptime(created__gte, "%d-%m-%Y"))
+            data_list = data_list.filter(created__gte=created__gte_date)
         if created__lte:
-            data_list = data_list.filter(created__lte=datetime.strptime(created__lte, "%d-%m-%Y"))
+            data_list = data_list.filter(created__lte=created__lte_date)
 
         try:
             if sensor_code:
@@ -76,8 +78,16 @@ def project_overview(request, project_code=False, sensor_code=False):
     op = request.GET.get('range') or 'DataDay'
 
     # CSV Export
+    time_range_error = False
+
     if request.GET.get('csv'):
-        return djqscsv.render_to_csv_response(data_list, filename='%s_%s_%s.csv' % (op.lower(), created__gte, created__lte))
+
+        time_range = created__lte_date - created__gte_date
+        if time_range.days > 365:
+            time_range_error = True
+
+        if not time_range_error:
+            return djqscsv.render_to_csv_response(data_list, filename='%s_%s_%s.csv' % (op.lower(), created__gte, created__lte))
 
 
     paginator = Paginator(data_list, 50)
@@ -149,6 +159,7 @@ def project_overview(request, project_code=False, sensor_code=False):
         'data_range_list': data_range_list,
         'created__gte': created__gte,
         'created__lte': created__lte,
+        'time_range_error': time_range_error
     })
     
     

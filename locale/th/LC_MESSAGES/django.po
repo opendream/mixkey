@@ -201,3 +201,6 @@ msgstr "ถึง"
 
 msgid "Submit"
 msgstr "ตกลง"
+
+msgid "CSV Export: You must be select \"From\" day and time range limit in 365 days. Please, contact administrator for longer time export"
+msgstr "CSV Export: คุณจำเป็นต้องเลือกวัน \"จาก\" และระยะเวลาที่เลือกต้องไม่เกิน 365 วัน กรุณาติดต่อเจ้าหน้าที่สำหรับการ export ที่เกิน 365 วัน"

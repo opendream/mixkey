@@ -154,8 +154,8 @@ class BaseData(models.Model):
         
         water_level = max(0, water_level)
 
-        #self.water_level_raw = water_level
-        #super(BaseData, self).save()
+        self.water_level_raw = water_level
+        super(BaseData, self).save()
 
         return int(water_level)
         
@@ -182,8 +182,8 @@ class BaseData(models.Model):
 
         #cache.set('data:%s:water_level' % self.id, water_level)
 
-        #self.water_level = water_level
-        #super(BaseData, self).save()
+        self.water_level = water_level
+        super(BaseData, self).save()
 
         return int(water_level)
 
@@ -209,8 +209,8 @@ class BaseData(models.Model):
 
         #cache.set('data:%s:battery' % self.id, battery)
 
-        #self.battery_median = battery
-        #super(BaseData, self).save()
+        self.battery_median = battery
+        super(BaseData, self).save()
 
         return battery
 
@@ -233,7 +233,7 @@ class BaseData(models.Model):
 
     @property        
     def get_category(self):
-        
+
         sensor = self.sensor
         water_level = self.get_water_level
         
@@ -242,7 +242,8 @@ class BaseData(models.Model):
         elif sensor.level_yellow and water_level >= sensor.level_yellow:
             return 'YELLOW'
 
-        return 'GREEN' 
+        return 'GREEN'
+
     @property
     def get_local_created(self):
         return self.created + timedelta(hours=self.sensor.project.timezone)

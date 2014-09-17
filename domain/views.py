@@ -57,9 +57,10 @@ def project_overview(request, project_code=False, sensor_code=False):
     created__lte_date = created__lte and datetime.strptime(created__lte, "%d-%m-%Y")
 
     sensor_selected = None
-    
+
+
     # List all data list
-    data_list = Data.objects.all().order_by('-created')
+    data_list = Data.objects.all().order_by('-created').prefetch_related('sensor', 'sensor__project')
     if project_selected:
         data_list = data_list.filter(sensor__project=project_selected)
         if created__gte:
@@ -115,19 +116,14 @@ def project_overview(request, project_code=False, sensor_code=False):
             sensor_query = [sensor_selected]
         else:
             sensor_query = project.sensor_set.all()
-        
+
         for sensor in sensor_query:
                         
             data = False
             sensor_data_list = sensor.data_set.order_by('-created')
 
-            if created__gte:
-                sensor_data_list = sensor_data_list.filter(created__gte=datetime.strptime(created__gte, "%d-%m-%Y"))
-            if created__lte:
-                sensor_data_list = sensor_data_list.filter(created__lte=datetime.strptime(created__lte, "%d-%m-%Y"))
-                        
             sensor.data_summary = data_summary(sensor, op=op, field_name=field_name, created__gte=created__gte, created__lte=created__lte)
-            
+
             try:
                 data = sensor_data_list[0]
             except IndexError:
@@ -148,9 +144,9 @@ def project_overview(request, project_code=False, sensor_code=False):
         data_range_list[i] = (key, value)
         
     data_range_list.append(('Data', 'Every one minutes'))
-        
+
     return render(request, 'overview.html', {
-        'data_list': data_list, 
+        'data_list': data_list,
         'project_list': project_list,
         'sensor_selected': sensor_selected,
         'field_name_list': field_name_list,

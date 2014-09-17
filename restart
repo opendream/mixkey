@@ -10,4 +10,5 @@ django-admin.py compilemessages
 python ./manage.py runfcgi host=127.0.0.1 port=8081 --settings=mixkey.settings
 
 sudo /etc/init.d/nginx start
+sudo /etc/init.d/memcached restart
 #python manage.py supervisor -d --noreload

@@ -53,8 +53,8 @@ def project_overview(request, project_code=False, sensor_code=False):
         
     created__gte = request.GET.get('created__gte') or ''
     created__lte = request.GET.get('created__lte') or ''
-    created__gte_date = datetime.strptime(created__gte, "%d-%m-%Y")
-    created__lte_date = datetime.strptime(created__lte, "%d-%m-%Y")
+    created__gte_date = created__gte and datetime.strptime(created__gte, "%d-%m-%Y")
+    created__lte_date = created__lte and datetime.strptime(created__lte, "%d-%m-%Y")
 
     sensor_selected = None
     

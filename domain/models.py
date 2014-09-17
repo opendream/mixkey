@@ -154,8 +154,8 @@ class BaseData(models.Model):
         
         water_level = max(0, water_level)
 
-        self.water_level_raw = water_level
-        super(BaseData, self).save()
+        #self.water_level_raw = water_level
+        #super(BaseData, self).save()
 
         return water_level
         
@@ -178,8 +178,8 @@ class BaseData(models.Model):
 
         #cache.set('data:%s:water_level' % self.id, water_level)
 
-        self.water_level = water_level
-        super(BaseData, self).save()
+        #self.water_level = water_level
+        #super(BaseData, self).save()
 
         return water_level
 
@@ -202,8 +202,8 @@ class BaseData(models.Model):
 
         #cache.set('data:%s:battery' % self.id, battery)
 
-        self.battery_median = battery
-        super(BaseData, self).save()
+        #self.battery_median = battery
+        #super(BaseData, self).save()
 
         return battery
 
@@ -244,6 +244,16 @@ class BaseData(models.Model):
         return 'Sensor: %s at %s' % (self.sensor.get_name(), self.get_local_created.strftime("%Y-%m-%d %H:%M:%S"))
         
     def save(self, *args, **kwargs):
+
+        if self.water_level is None:
+            self.water_level = self.get_water_level
+
+        if self.water_level_raw is None:
+            self.water_level_raw = self.get_water_level_raw
+
+        if self.battery_median is None:
+            self.battery_median = self.get_battery
+
         super(BaseData, self).save(*args, **kwargs)
         from domain.tasks import send_alert, send_battery_alert
         #send_alert.delay(self.id)

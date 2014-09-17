@@ -19,6 +19,7 @@ from datetime import datetime, timedelta
 
 import numpy as np
 import copy, re
+import djqscsv
 
 field_name_list = ['utrasonic', 'temperature', 'humidity', 'raingauge', 'battery']
 field_label_list ={
@@ -71,6 +72,14 @@ def project_overview(request, project_code=False, sensor_code=False):
         except Sensor.DoesNotExist:
             pass
 
+    field_name = request.GET.get('field') or 'utrasonic'
+    op = request.GET.get('range') or 'DataDay'
+
+    # CSV Export
+    if request.GET.get('csv'):
+        return djqscsv.render_to_csv_response(data_list, filename='%s_%s_%s.csv' % (op.lower(), created__gte, created__lte))
+
+
     paginator = Paginator(data_list, 50)
     page = request.GET.get('page')
 
@@ -86,9 +95,6 @@ def project_overview(request, project_code=False, sensor_code=False):
 
     # Summary
     project_list = []
-    
-    field_name = request.GET.get('field') or 'utrasonic'
-    op = request.GET.get('range') or 'DataDay'
 
 
     for project in project_query:

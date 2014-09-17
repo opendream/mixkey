@@ -151,7 +151,7 @@ class BaseDataResource(ModelResource):
     sensor = fields.ForeignKey(SensorResource, 'sensor', full=True)
     project = fields.ForeignKey(ProjectResource, 'sensor__project')
     
-    water_level = fields.FloatField(attribute='get_water_level_raw')
+    water_level = fields.FloatField(attribute='get_water_level')
     difference_status = fields.CharField(attribute='get_difference_status')
     created = fields.DateTimeField(attribute='created')
     local_created = fields.DateTimeField(attribute='get_local_created')
@@ -160,7 +160,7 @@ class BaseDataResource(ModelResource):
 
 class DataResource(BaseDataResource):
     class Meta:
-        queryset = Data.objects.all().order_by('-created')
+        queryset = Data.objects.all().order_by('-created').prefetch_related('sensor', 'sensor__project')
         resource_name = 'data'
         
         filtering = base_data_filtering
@@ -172,7 +172,7 @@ class DataResource(BaseDataResource):
             
 class DataTenMinuteResource(BaseDataResource):
     class Meta:
-        queryset = DataTenMinute.objects.all().order_by('-created')
+        queryset = DataTenMinute.objects.all().order_by('-created').prefetch_related('sensor', 'sensor__project')
         resource_name = 'data_ten_minute'
         
         filtering = base_data_filtering
@@ -182,7 +182,7 @@ class DataTenMinuteResource(BaseDataResource):
 
 class DataThirtyMinuteResource(BaseDataResource):
     class Meta:
-        queryset = DataThirtyMinute.objects.all().order_by('-created')
+        queryset = DataThirtyMinute.objects.all().order_by('-created').prefetch_related('sensor', 'sensor__project')
         resource_name = 'data_thirty_minute'
         
         filtering = base_data_filtering
@@ -192,7 +192,7 @@ class DataThirtyMinuteResource(BaseDataResource):
 
 class DataHourResource(BaseDataResource):
     class Meta:
-        queryset = DataHour.objects.all().order_by('-created')
+        queryset = DataHour.objects.all().order_by('-created').prefetch_related('sensor', 'sensor__project')
         resource_name = 'data_hour'
         
         filtering = base_data_filtering
@@ -202,7 +202,7 @@ class DataHourResource(BaseDataResource):
         
 class DataDayResource(BaseDataResource):
     class Meta:
-        queryset = DataDay.objects.all().order_by('-created')
+        queryset = DataDay.objects.all().order_by('-created').prefetch_related('sensor', 'sensor__project')
         resource_name = 'data_day'
         
         filtering = base_data_filtering
@@ -212,7 +212,7 @@ class DataDayResource(BaseDataResource):
         
 class DataWeekResource(BaseDataResource):
     class Meta:
-        queryset = DataWeek.objects.all().order_by('-created')
+        queryset = DataWeek.objects.all().order_by('-created').prefetch_related('sensor', 'sensor__project')
         resource_name = 'data_week'
         
         filtering = base_data_filtering
@@ -222,7 +222,7 @@ class DataWeekResource(BaseDataResource):
         
 class DataMonthResource(BaseDataResource):
     class Meta:
-        queryset = DataMonth.objects.all().order_by('-created')
+        queryset = DataMonth.objects.all().order_by('-created').prefetch_related('sensor', 'sensor__project')
         resource_name = 'data_month'
         
         filtering = base_data_filtering
@@ -232,7 +232,7 @@ class DataMonthResource(BaseDataResource):
         
 class DataYearResource(BaseDataResource):
     class Meta:
-        queryset = DataYear.objects.all().order_by('-created')
+        queryset = DataYear.objects.all().order_by('-created').prefetch_related('sensor', 'sensor__project')
         resource_name = 'data_year'
         
         filtering = base_data_filtering

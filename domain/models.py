@@ -133,6 +133,7 @@ class BaseData(models.Model):
     raingauge   = models.FloatField(null=True, blank=True)
     battery     = models.FloatField(null=True, blank=True)
     battery_median = models.FloatField(null=True, blank=True)
+    difference_status = models.CharField(null=True, blank=True, max_length=10)
 
     created     = models.DateTimeField()
     
@@ -217,7 +218,10 @@ class BaseData(models.Model):
 
     @property    
     def get_difference_status(self):
-                
+
+        if self.difference_status is not None:
+            return self.difference_status
+
         prev_data = self.sensor.data_set.filter(created__lte=self.created).latest('created')
         prev_water_level_raw = prev_data.get_water_level_raw
         
@@ -228,7 +232,10 @@ class BaseData(models.Model):
             status = 'up'
         elif water_level_raw < prev_water_level_raw - 5:
             status = 'down'
-        
+
+        self.difference_status = status
+        super(BaseData, self).save()
+
         return status
 
     @property        

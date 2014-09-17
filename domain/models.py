@@ -174,7 +174,11 @@ class BaseData(models.Model):
     
         data_list = self.sensor.data_set.filter(created__lte=self.created, created__gte=time_prev_check).order_by('-created')[0:10]
         water_level_list = [d.get_water_level_raw for d in data_list]
-        water_level = max(0, median(water_level_list))
+
+        try:
+            water_level = max(0, median(water_level_list))
+        except IndexError:
+            water_level = self.get_water_level_raw
 
         #cache.set('data:%s:water_level' % self.id, water_level)
 
@@ -198,7 +202,10 @@ class BaseData(models.Model):
 
         data_list = self.sensor.data_set.filter(created__lte=self.created, created__gte=time_prev_check).order_by('-created')[0:10]
         battery_list = [d.battery for d in data_list]
-        battery = max(0, median(battery_list))
+        try:
+            battery = max(0, median(battery_list))
+        except IndexError:
+            battery = self.battery
 
         #cache.set('data:%s:battery' % self.id, battery)
 

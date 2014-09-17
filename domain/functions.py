@@ -5,10 +5,9 @@ def median(mylist):
 
     sorts = sorted(mylist)
     length = len(sorts)
-    try:
-        return sorts[length / 2]
-    except IndexError:
-        return None
+
+    return sorts[length / 2]
+
 
 
 

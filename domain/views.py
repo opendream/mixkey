@@ -71,7 +71,7 @@ def project_overview(request, project_code=False, sensor_code=False):
         except Sensor.DoesNotExist:
             pass
 
-    paginator = Paginator(data_list, 30)
+    paginator = Paginator(data_list, 50)
     page = request.GET.get('page')
 
     try:

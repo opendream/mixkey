@@ -143,7 +143,7 @@ class BaseData(models.Model):
     def get_water_level_raw(self):
 
         if self.water_level_raw is not None:
-            return self.water_level_raw
+            return int(self.water_level_raw)
         
         if self.sensor.formula:
             x = self.utrasonic
@@ -157,13 +157,13 @@ class BaseData(models.Model):
         #self.water_level_raw = water_level
         #super(BaseData, self).save()
 
-        return water_level
+        return int(water_level)
         
     @property    
     def get_water_level(self):
 
         if self.water_level is not None:
-            return self.water_level
+            return int(self.water_level)
 
         #water_level = cache.get('data:%s:water_level' % self.id)
         #if water_level is not None:
@@ -185,7 +185,7 @@ class BaseData(models.Model):
         #self.water_level = water_level
         #super(BaseData, self).save()
 
-        return water_level
+        return int(water_level)
 
     @property    
     def get_battery(self):

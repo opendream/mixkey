@@ -269,6 +269,9 @@ class BaseData(models.Model):
         if self.battery_median is None:
             self.battery_median = self.get_battery
 
+        if self.difference_status is None:
+            self.difference_status = self.get_difference_status
+
         super(BaseData, self).save(*args, **kwargs)
         from domain.tasks import send_alert, send_battery_alert
         #send_alert.delay(self.id)

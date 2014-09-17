@@ -126,6 +126,7 @@ class BaseData(models.Model):
     
     sensor      = models.ForeignKey(Sensor)
     water_level = models.FloatField(null=True, blank=True)
+    water_level_raw = models.FloatField(null=True, blank=True)
     utrasonic   = models.IntegerField(null=True, blank=True)
     temperature = models.FloatField(null=True, blank=True)
     humidity    = models.IntegerField(null=True, blank=True)

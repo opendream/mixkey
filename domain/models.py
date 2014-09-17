@@ -132,7 +132,8 @@ class BaseData(models.Model):
     humidity    = models.IntegerField(null=True, blank=True)
     raingauge   = models.FloatField(null=True, blank=True)
     battery     = models.FloatField(null=True, blank=True)
-    
+    battery_median = models.FloatField(null=True, blank=True)
+
     created     = models.DateTimeField()
     
     class Meta:
@@ -140,6 +141,9 @@ class BaseData(models.Model):
     
     @property
     def get_water_level_raw(self):
+
+        if self.water_level_raw is not None:
+            return self.water_level_raw
         
         if self.sensor.formula:
             x = self.utrasonic
@@ -148,14 +152,22 @@ class BaseData(models.Model):
         else:
             water_level = self.utrasonic
         
-        return max(0, water_level)
+        water_level = max(0, water_level)
+
+        self.water_level_raw = water_level
+        super(BaseData, self).save()
+
+        return water_level
         
     @property    
     def get_water_level(self):
 
-        water_level = cache.get('data:%s:water_level' % self.id)
-        if water_level is not None:
-            return water_level
+        if self.water_level is not None:
+            return self.water_level
+
+        #water_level = cache.get('data:%s:water_level' % self.id)
+        #if water_level is not None:
+        #    return water_level
 
         # List of the data previous in 10 miniutes
         time_prev_check = self.created-timedelta(minutes=settings.PREV_DATA_BUFFER_TIME)
@@ -164,16 +176,22 @@ class BaseData(models.Model):
         water_level_list = [d.get_water_level_raw for d in data_list]
         water_level = max(0, median(water_level_list))
 
-        cache.set('data:%s:water_level' % self.id, water_level)
+        #cache.set('data:%s:water_level' % self.id, water_level)
+
+        self.water_level = water_level
+        super(BaseData, self).save()
 
         return water_level
 
     @property    
     def get_battery(self):
 
-        battery = cache.get('data:%s:battery' % self.id)
-        if battery is not None:
-            return battery
+        if self.battery_median is not None:
+            return self.battery_median
+
+        #battery = cache.get('data:%s:battery' % self.id)
+        #if battery is not None:
+        #    return battery
             
         # List of the data previous in 10 miniutes
         time_prev_check = self.created-timedelta(minutes=settings.PREV_DATA_BUFFER_TIME)
@@ -182,7 +200,10 @@ class BaseData(models.Model):
         battery_list = [d.battery for d in data_list]
         battery = max(0, median(battery_list))
 
-        cache.set('data:%s:battery' % self.id, battery)
+        #cache.set('data:%s:battery' % self.id, battery)
+
+        self.battery_median = battery
+        super(BaseData, self).save()
 
         return battery
 

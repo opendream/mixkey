@@ -151,7 +151,7 @@ class BaseDataResource(ModelResource):
     sensor = fields.ForeignKey(SensorResource, 'sensor', full=True)
     project = fields.ForeignKey(ProjectResource, 'sensor__project')
     
-    #water_level = fields.FloatField(attribute='get_water_level_raw')
+    water_level = fields.FloatField(attribute='get_water_level_raw')
     difference_status = fields.CharField(attribute='get_difference_status')
     created = fields.DateTimeField(attribute='created')
     local_created = fields.DateTimeField(attribute='get_local_created')

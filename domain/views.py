@@ -2,6 +2,7 @@
 
 # Create your views here.
 from django import http
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound
 from django.forms.models import model_to_dict
@@ -69,8 +70,18 @@ def project_overview(request, project_code=False, sensor_code=False):
                 data_list = data_list.filter(sensor=sensor_selected)
         except Sensor.DoesNotExist:
             pass
-        
-    data_list = data_list[0:30]
+
+    paginator = Paginator(data_list, 30)
+    page = request.GET.get('page')
+
+    try:
+        data_list = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        data_list = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        data_list = paginator.page(paginator.num_pages)
 
 
     # Summary

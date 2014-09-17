@@ -405,7 +405,31 @@ google.maps.event.addDomListener(window, 'load', initialize);
       {% endfor %}
     
     </tbody>
+
   </table>
+
+  {% if data_list.paginator.page_range|length > 1 %}
+  <div class="panel-footer">
+    <ul class="pagination">
+
+      {% if data_list.has_previous %}
+      <li><a href="?page={{ data_list.paginator.page_range|first }}">&laquo;</a></li>
+      <li><a href="?page={{ data_list.previous_page_number }}">‹</a></li>
+      {% endif %}
+
+      {% for page_num in data_list.paginator.page_range %}
+      {% if page_num <= data_list.number|add:"2" and page_num >= data_list.number|add:"-2" %}
+      <li{% if page_num == data_list.number %} class="active"{% endif %}><a href="?page={{ page_num }}">{{ page_num }}</a></li>
+      {% endif %}
+      {% endfor %}
+
+      {% if data_list.has_next %}
+      <li><a href="?page={{ data_list.next_page_number }}">›</a></li>
+      <li><a href="?page={{ data_list.paginator.page_range|last }}">&raquo;</a></li>
+      {% endif %}
+    </ul>
+  </div>
+  {% endif %}
 
 </div>
 

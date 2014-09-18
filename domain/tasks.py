@@ -35,7 +35,8 @@ def send_sms(project, message_body, category, sensor=None, created=None, subject
         tel_list = project.tel_list or ''
         
     email_list = []
-    
+
+
     for tel_email in tel_list.split(','):
         
         tel_email = '%s|' % tel_email
@@ -116,7 +117,7 @@ def count_log_category(log_list, category):
     return count
     
 def alert_message(category, project, sensor, value, text='water level: %s cm.'):
-    
+
     return '\n'.join([
         '[%s CODE] from telemetry station' % SMSLog(category=category).get_category_display(),
         'Project: %s -- report reference from MSL.' % project.get_name(),
@@ -135,7 +136,8 @@ def send_alert(data):
     
     if not sensor.project.tel_list and not sensor.tel_list:
         return False
-    
+
+
     latest_sms = False
     try:
         latest_sms = SMSLog.objects.filter(sensor=sensor).order_by('-created')[0]
@@ -143,7 +145,8 @@ def send_alert(data):
             return False
     except IndexError:
         pass
-                
+
+
     project = data.sensor.project
     water_level_median = data.get_water_level
     
@@ -153,7 +156,6 @@ def send_alert(data):
     #time_prev_check_repeat = data.created-timedelta(minutes=settings.PREV_DATA_BUFFER_TIME*(settings.MAX_REPEAT_ALERT))
     log_list = SMSLog.objects.filter(sensor=sensor).order_by('-created')
   
-    
     # Red code alert limit in 5 times
     if water_level_median >= sensor.level_red:
         if count_log_category(log_list[0: settings.MAX_REPEAT_ALERT], SMSLog.ALERT_RED) < settings.MAX_REPEAT_ALERT:

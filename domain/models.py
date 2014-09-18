@@ -142,6 +142,9 @@ class BaseData(models.Model):
     
     @property
     def get_water_level_raw(self):
+        return self._get_water_level_raw()
+
+    def _get_water_level_raw(self, commit=True):
 
         if self.water_level_raw is not None:
             return int(self.water_level_raw)
@@ -156,12 +159,17 @@ class BaseData(models.Model):
         water_level = max(0, water_level)
 
         self.water_level_raw = water_level
-        super(BaseData, self).save()
+
+        if commit:
+            super(BaseData, self).save()
 
         return int(water_level)
         
     @property    
     def get_water_level(self):
+        return self._get_water_level()
+
+    def _get_water_level(self, commit=True):
 
         if self.water_level is not None:
             return int(self.water_level)
@@ -174,22 +182,27 @@ class BaseData(models.Model):
         time_prev_check = self.created-timedelta(minutes=settings.PREV_DATA_BUFFER_TIME)
     
         data_list = self.sensor.data_set.filter(created__lte=self.created, created__gte=time_prev_check).order_by('-created')[0:10]
-        water_level_list = [d.get_water_level_raw for d in data_list]
+        water_level_list = [d._get_water_level_raw(commit=commit) for d in data_list]
 
         try:
             water_level = max(0, median(water_level_list))
         except IndexError:
-            water_level = self.get_water_level_raw
+            water_level = self._get_water_level_raw(commit=commit)
 
         #cache.set('data:%s:water_level' % self.id, water_level)
 
         self.water_level = water_level
-        super(BaseData, self).save()
+
+        if commit:
+            super(BaseData, self).save()
 
         return int(water_level)
 
     @property    
     def get_battery(self):
+        return self._get_battery()
+
+    def _get_battery(self, commit=True):
 
         if self.battery_median is not None:
             return self.battery_median
@@ -211,13 +224,18 @@ class BaseData(models.Model):
         #cache.set('data:%s:battery' % self.id, battery)
 
         self.battery_median = battery
-        super(BaseData, self).save()
+
+        if commit:
+            super(BaseData, self).save()
 
         return battery
 
 
     @property    
     def get_difference_status(self):
+        return self._get_difference_status()
+
+    def _get_difference_status(self, commit=True):
 
         if self.difference_status is not None:
             return self.difference_status
@@ -234,7 +252,9 @@ class BaseData(models.Model):
             status = 'down'
 
         self.difference_status = status
-        super(BaseData, self).save()
+
+        if commit:
+            super(BaseData, self).save()
 
         return status
 
@@ -261,21 +281,22 @@ class BaseData(models.Model):
     def save(self, *args, **kwargs):
 
         if self.water_level is None:
-            self.water_level = self.get_water_level
+            self.water_level = self._get_water_level(commit=False)
 
         if self.water_level_raw is None:
-            self.water_level_raw = self.get_water_level_raw
+            self.water_level_raw = self._get_water_level_raw(commit=False)
 
         if self.battery_median is None:
-            self.battery_median = self.get_battery
+            self.battery_median = self._get_battery(commit=False)
 
         if self.difference_status is None:
-            self.difference_status = self.get_difference_status
+            self.difference_status = self._get_difference_status(commit=False)
 
         super(BaseData, self).save(*args, **kwargs)
         from domain.tasks import send_alert, send_battery_alert
         #send_alert.delay(self.id)
-        send_alert(self.id)        
+
+        send_alert(self.id)
         send_battery_alert(self.id)
         
 class SMSLog(models.Model):

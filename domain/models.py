@@ -297,7 +297,7 @@ class BaseData(models.Model):
         #send_alert.delay(self.id)
 
         send_alert(self.id)
-        send_battery_alert(self.id)
+        #send_battery_alert(self.id)
         
 class SMSLog(models.Model):
     

@@ -7,7 +7,8 @@ def site_information(request):
             
     context = {
         'settings':settings,
-        'global_project_list': Project.objects.exclude(sensor__data=None).order_by('-created'),
+        'global_project_list': Project.objects.exclude(code='unknow').order_by('-created'),
+        #'global_project_list': Project.objects.all().order_by('-created'),
         'project_selected': request.META.get('PROJECT_SELECTED'),
     }
 

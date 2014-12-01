@@ -187,6 +187,8 @@ def data_summary(sensor, op='DataDay', field_name='utrasonic', created__gte='', 
         lost_list = list(SMSLog.objects.filter(sensor=sensor, category=SMSLog.SENSOR_LOST, created__gte=cache_list[0].created).order_by('-created'))
     except InstCache.DoesNotExist:
         pass
+    except IndexError:
+        pass
     
     
     data_list = []

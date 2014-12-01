@@ -1,14 +1,6 @@
 #! /bin/bash
-cd /home/labs/.virtualenvs/mixkey
-source bin/activate
-cd -
-#python manage.py supervisor stop all
-#python manage.py supervisor shutdown
 sudo kill `lsof -t -i:8081`
 sudo /etc/init.d/nginx stop
-django-admin.py compilemessages
-python ./manage.py runfcgi host=127.0.0.1 port=8081 --settings=mixkey.settings
-
+/home/labs/.virtualenvs/mixkey/bin/python /web/sites/mixkey/source/mixkey/manage.py runfcgi host=127.0.0.1 port=8081 --settings=mixkey.settings
 sudo /etc/init.d/nginx start
 sudo /etc/init.d/memcached restart
-#python manage.py supervisor -d --noreload

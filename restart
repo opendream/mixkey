@@ -1,6 +1,6 @@
 #! /bin/bash
 sudo kill `lsof -t -i:8081`
-sudo /etc/init.d/nginx stop
+sudo service nginx stop
 /home/labs/.virtualenvs/mixkey/bin/python /web/sites/mixkey/source/mixkey/manage.py runfcgi host=127.0.0.1 port=8081 --settings=mixkey.settings
-sudo /etc/init.d/nginx start
-sudo /etc/init.d/memcached restart
+sudo service nginx start
+sudo service memcached restart

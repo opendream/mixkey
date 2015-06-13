@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.conf import settings
 from django.db.models import Q
 from django.core.mail import send_mail
@@ -87,20 +89,23 @@ def send_daily():
     for project in project_list:
 
         
+        #messages = [
+        #    'Daily update from telemetry station util yesterday midnight.',
+        #    'Project: %s -- report reference from MSL.' % project.get_name()
+        #]
         messages = [
-            'Daily update from telemetry station util yesterday midnight.',
-            'Project: %s -- report reference from MSL.' % project.get_name()
+            'รายงานประจำวันจากระบบวัดระดับน้ำก่อนเที่ยงคืนเมื่อวานนี้.',
+            'โครงการ: %s -- รายงานอ้างอิงจากระดับน้ำ.' % project.get_name()
         ]
-        
         for sensor in project.sensor_set.all():
             
             data_list = sensor.data_set.filter(created__gt=yesterday, created__lte=yesterday_midnight)
             water_level_list = [data.get_water_level for data in data_list]
             
             if water_level_list:
-                messages.append('Sensor %s -- max: %s cm., min: %s cm., average: %s cm.' % (sensor.get_name(), (max(water_level_list)), (min(water_level_list)), round(float(sum(water_level_list))/len(water_level_list), 2)))
+                messages.append('เครื่องตรวจวัด %s -- สูงสุด: %s ซม., ต่ำสุด: %s ซม., เฉลี่ย: %s ซม.' % (sensor.get_name(), (max(water_level_list)), (min(water_level_list)), round(float(sum(water_level_list))/len(water_level_list), 2)))
             else:
-                messages.append('Sensor %s -- no data recorded, something problems, please check the sensor.' % (sensor.get_name()))
+                messages.append('เครื่องตรวจวัด %s -- ไม่พบบันทึกข้อมูล, มีบางอย่างผิดพลาด, กรุณาตรวจสอบเครื่องตรวจวัดด้วย' % (sensor.get_name()))
                 
         message_body = '\n'.join(messages)
         
@@ -116,15 +121,21 @@ def count_log_category(log_list, category):
             count = count + 1
     return count
     
-def alert_message(category, project, sensor, value, text='water level: %s cm.'):
+#def alert_message(category, project, sensor, value, text='water level: %s cm.'):
+#
+#    return '\n'.join([
+#        '[%s CODE] from telemetry station' % SMSLog(category=category).get_category_display(),
+#        'Project: %s -- report reference from MSL.' % project.get_name(),
+#        ('Sensor %s -- ' + text) % (sensor.get_name(), value)
+#    ])
+def alert_message(category, project, sensor, value, text='ระดับน้ำสูง: %s ซม.'):
 
     return '\n'.join([
-        '[%s CODE] from telemetry station' % SMSLog(category=category).get_category_display(),
-        'Project: %s -- report reference from MSL.' % project.get_name(),
-        ('Sensor %s -- ' + text) % (sensor.get_name(), value)     
+        '[%s CODE] แจ้งเตือนจากระบบวัดระดับน้ำ' % SMSLog(category=category).get_category_display(),
+        'โครงการ: %s รายงานอ้างอิงจากระดับน้ำ' % project.get_name(),
+        ('เครื่องตรวจวัด %s -- ' + text) % (sensor.get_name(), value)
     ])
-    
-    
+
 @task()
 def send_alert(data):
     
@@ -203,8 +214,9 @@ def send_battery_alert(data):
     #time_prev_check_repeat = data.created-timedelta(minutes=settings.PREV_DATA_BUFFER_TIME*(settings.MAX_REPEAT_ALERT))
     log_list = SMSLog.objects.filter(sensor=sensor).order_by('-created')
   
-    alert_text = 'battery: %s V.'
-    
+    #alert_text = 'battery: %s V.'
+    alert_text = 'แบตเตอรี่: %s V.'
+
     # Red code alert limit in 5 times
     if battery_median <= settings.BATTERY_RED_LEVEL:
         if count_log_category(log_list[0: settings.MAX_REPEAT_ALERT], SMSLog.ALERT_BATTERY_RED) < settings.MAX_REPEAT_ALERT:
@@ -235,9 +247,13 @@ def detect_sensor_lost():
         latest_data = sensor.data_set.latest('created')
      
         if (latest_data.created <= today - timedelta(minutes=settings.DETECT_SENSOR_LOST_TIME)) and (latest_data.created > today - timedelta(minutes=settings.DETECT_SENSOR_LOST_TIME*2)):
+            #messages = [
+            #    'Detect sensor lost signal more than %s minutes.' % settings.DETECT_SENSOR_LOST_TIME,
+            #    'Project %s -- Sensor %s.' % (sensor.project.get_name(), sensor.get_name())
+            #]
             messages = [
-                'Detect sensor lost signal more than %s minutes.' % settings.DETECT_SENSOR_LOST_TIME,
-                'Project %s -- Sensor %s.' % (sensor.project.get_name(), sensor.get_name())
+                'ตรวจพบสัญญาณจากเครื่องตรวจวัดขาดหายเกิน %s นาที' % settings.DETECT_SENSOR_LOST_TIME,
+                'โครงการ %s -- เครื่องตรวจวัด %s.' % (sensor.project.get_name(), sensor.get_name())
             ]
             message_body = '\n'.join(messages)        
             

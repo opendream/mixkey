@@ -30,6 +30,9 @@ urlpatterns = patterns('',
     # Force to order end
     url(r'^(?P<project_code>[A-Za-z0-9_-]+)/(?P<sensor_code>[A-Za-z0-9_-]+)/$', 'domain.views.sensor_overview', name='sensor_overview'),
     url(r'^(?P<project_code>[A-Za-z0-9_-]+)/$', 'domain.views.project_overview', name='project_overview'),
+    #url(r'^(?P<project_code>\w+)/(?P<sensor_code>\w+)/$', 'domain.views.sensor_overview', name='sensor_overview'),
+    #url(r'^(?P<project_code>\w+)/$', 'domain.views.project_overview', name='project_overview'),
+    
     
     
 )

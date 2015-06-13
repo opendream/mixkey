@@ -118,6 +118,8 @@ def project_overview(request, project_code=False, sensor_code=False):
             sensor_query = project.sensor_set.all()
 
         for sensor in sensor_query:
+            if '=' in sensor.code:
+                continue
                         
             data = False
             sensor_data_list = sensor.data_set.order_by('-created')

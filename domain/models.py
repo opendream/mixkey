@@ -240,7 +240,11 @@ class BaseData(models.Model):
         if self.difference_status is not None:
             return self.difference_status
 
-        prev_data = self.sensor.data_set.filter(created__lte=self.created).latest('created')
+        try:
+            prev_data = self.sensor.data_set.filter(created__lte=self.created).latest('created')
+        except:
+            prev_data = self
+
         prev_water_level_raw = prev_data.get_water_level_raw
         
         water_level_raw = self.get_water_level_raw

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -46,10 +48,10 @@ ALERT_YELLOW = 2
 ALERT_GREEN  = 3
 DAILY        = 4
 CATEGORY_CHOICES = (
-    (ALERT_RED, 'RED'), 
-    (ALERT_YELLOW, 'YELLOW'), 
-    (ALERT_GREEN, 'GREEN'), 
-    (DAILY, 'DAILY')
+    (ALERT_RED, 'รหัสเตือนภัยสีแดง'),
+    (ALERT_YELLOW, 'รหัสเตือนภัยสีเหลือง'),
+    (ALERT_GREEN, 'รหัสเตือนภัยสีเขียว'),
+    (DAILY, 'รายงานรายวัน'),
 )
 
 class Project(models.Model):
@@ -316,10 +318,10 @@ class SMSLog(models.Model):
     ALERT_BATTERY_GREEN  = 13
     
     CATEGORY_CHOICES = (
-        (ALERT_RED, 'RED'), 
-        (ALERT_YELLOW, 'YELLOW'), 
-        (ALERT_GREEN, 'GREEN'), 
-        (DAILY, 'DAILY'),
+        (ALERT_RED, 'รหัสเตือนภัยสีแดง'),
+        (ALERT_YELLOW, 'รหัสเตือนภัยสีเหลือง'),
+        (ALERT_GREEN, 'รหัสเตือนภัยสีเขียว'),
+        (DAILY, 'รายงานรายวัน'),
         (SENSOR_LOST, 'SENSOR LOST'),
         (ALERT_BATTERY_RED, 'BATTERY RED'),
         (ALERT_BATTERY_YELLOW, 'BATTERY YELLOW'),

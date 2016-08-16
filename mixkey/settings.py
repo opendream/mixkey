@@ -26,7 +26,7 @@ DATABASES = {
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -197,7 +197,6 @@ LOGGING = {
 }
 
 # Celery ###############################################################################################################
-
 import djcelery
 djcelery.setup_loader()
 
@@ -239,19 +238,16 @@ EMAIL_DOMAIN_NAME = 'mixkey-data.opendreamlabs.com'
 EMAIL_ADDRESS_NO_REPLY = '%s <webmaster@%s>' % (EMAIL_SUBJECT_PREFIX, EMAIL_DOMAIN_NAME)
 
 CACHES = {
-    'default': {
-        #'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
-        'TIMEOUT': 60*10
-    },
-    'resources': {
-        #'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
-        'TIMEOUT': 60*10
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        'TIMEOUT': 60*10,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
 }
+CACHES['resource'] = CACHES['default']
 
 # Level Settings #######################################################################################################
 

@@ -43,6 +43,8 @@ def sensor_overview(request, project_code, sensor_code):
     
 
 def project_overview(request, project_code=False, sensor_code=False):        
+    if project_code:
+        get_object_or_404(Project, code=project_code)
         
     project_selected = request.META.get('PROJECT_SELECTED')
     

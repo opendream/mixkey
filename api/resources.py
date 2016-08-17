@@ -161,14 +161,14 @@ class BaseDataResource(ModelResource):
         A version of ``obj_get_list`` that uses the cache as a means to get
         commonly-accessed data faster.
         """
-        cache_key = self.generate_cache_key('list', **kwargs)
+        cache_key = self.generate_cache_key('list', **bundle.request.GET.dict())
         obj_list = self._meta.cache.get(cache_key)
 
         limit = bundle.request.GET.get('limit') or self._meta.limit
 
         if obj_list is None:
             obj_list = self.obj_get_list(bundle=bundle, **kwargs)
-            self._meta.cache.set(cache_key, obj_list[0:limit])
+            self._meta.cache.set(cache_key, list(obj_list[0:limit]))
 
         return obj_list
 

@@ -2,4 +2,3 @@
 
 sudo service uwsgi restart
 sudo service nginx restart
-sudo service memcached restart

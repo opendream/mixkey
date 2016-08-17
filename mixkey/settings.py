@@ -252,6 +252,7 @@ CACHES = {
     }
 }
 CACHES['resource'] = CACHES['default']
+TASTYPIE_DEFAULT_FORMATS = ['json']
 
 # Level Settings #######################################################################################################
 

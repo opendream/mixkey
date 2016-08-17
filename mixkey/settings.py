@@ -98,7 +98,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     #'django.middleware.cache.UpdateCacheMiddleware',
@@ -159,13 +159,17 @@ INSTALLED_APPS = (
     'djsupervisor',
     'daterange_filter',
     'south',
-    'debug_toolbar',
+    # 'debug_toolbar',
     
     # Project
     'domain',
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
+
+SESSION_ENGINE = 'redis_sessions.session'
+SESSION_REDIS_PREFIX = 'session'
+SESSION_COOKIE_AGE = 60*60*24
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -241,7 +245,7 @@ CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://127.0.0.1:6379/1",
-        'TIMEOUT': 60*10,
+        'TIMEOUT': 60*5,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }

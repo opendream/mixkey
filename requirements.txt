@@ -11,6 +11,7 @@ celery==3.0.24
 django-celery==3.0.23
 django-daterange-filter==1.0.0
 django-kombu==0.9.4
+django-redis==3.8.4
 django-supervisor==0.3.1
 django-tastypie==0.11.0
 flup==1.0.2

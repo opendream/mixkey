@@ -156,6 +156,22 @@ class BaseDataResource(ModelResource):
     created = fields.DateTimeField(attribute='created')
     local_created = fields.DateTimeField(attribute='get_local_created')
 
+    def cached_obj_get_list(self, bundle, **kwargs):
+        """
+        A version of ``obj_get_list`` that uses the cache as a means to get
+        commonly-accessed data faster.
+        """
+        cache_key = self.generate_cache_key('list', **kwargs)
+        obj_list = self._meta.cache.get(cache_key)
+
+        limit = bundle.request.GET.get('limit') or self._meta.limit
+
+        if obj_list is None:
+            obj_list = self.obj_get_list(bundle=bundle, **kwargs)
+            self._meta.cache.set(cache_key, obj_list[0:limit])
+
+        return obj_list
+
     def get_list(self, request, **kwargs):
         """
         Returns a serialized list of resources.
@@ -197,6 +213,8 @@ class DataResource(BaseDataResource):
         filtering = base_data_filtering
         ordering = base_data_ordering
         serializer = DataRSSSerializer()
+        max_limit = 10
+        limit = 10
 
         cache = SimpleCache(timeout=60*10)
 
@@ -208,6 +226,8 @@ class DataTenMinuteResource(BaseDataResource):
         
         filtering = base_data_filtering
         ordering = base_data_ordering
+        max_limit = 10
+        limit = 10
 
         cache = SimpleCache(timeout=60*10)
 
@@ -218,6 +238,8 @@ class DataThirtyMinuteResource(BaseDataResource):
         
         filtering = base_data_filtering
         ordering = base_data_ordering
+        max_limit = 10
+        limit = 10
 
         cache = SimpleCache(timeout=60*30)
 
@@ -228,6 +250,8 @@ class DataHourResource(BaseDataResource):
         
         filtering = base_data_filtering
         ordering = base_data_ordering
+        max_limit = 10
+        limit = 10
 
         cache = SimpleCache(timeout=60*60)
         
@@ -238,6 +262,8 @@ class DataDayResource(BaseDataResource):
         
         filtering = base_data_filtering
         ordering = base_data_ordering
+        max_limit = 10
+        limit = 10
 
         cache = SimpleCache(timeout=60*60*24)
         
@@ -248,6 +274,8 @@ class DataWeekResource(BaseDataResource):
         
         filtering = base_data_filtering
         ordering = base_data_ordering
+        max_limit = 10
+        limit = 10
 
         cache = SimpleCache(timeout=60*60*24*7)
         
@@ -258,6 +286,8 @@ class DataMonthResource(BaseDataResource):
         
         filtering = base_data_filtering
         ordering = base_data_ordering
+        max_limit = 10
+        limit = 10
 
         cache = SimpleCache(timeout=60*60*24*30)
         
@@ -268,6 +298,8 @@ class DataYearResource(BaseDataResource):
         
         filtering = base_data_filtering
         ordering = base_data_ordering
+        max_limit = 10
+        limit = 10
 
         cache = SimpleCache(timeout=60*60*24*364)
         
